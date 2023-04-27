@@ -68,4 +68,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Image::class, 'images_likes', 'user_id', 'image_id');
     }
+    public function saved_images()
+    {
+        return $this->belongsToMany(Image::class, 'images_saved', 'user_id', 'image_id');
+    }
 }

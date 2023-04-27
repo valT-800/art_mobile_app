@@ -34,4 +34,8 @@ class Image extends Model
     {
         return $this->belongsToMany(User::class, 'images_likes', 'image_id', 'user_id');
     }
+    public function users_saved()
+    {
+        return $this->belongsToMany(User::class, 'images_saved', 'image_id', 'user_id');
+    }
 }
