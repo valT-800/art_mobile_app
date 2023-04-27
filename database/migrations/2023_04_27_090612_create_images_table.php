@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text('description');
             $table->foreignId('album_id')->nullable();
-            $table->bigInteger('views')->unsigned();
+            $table->bigInteger('views')->unsigned()->nullable();
             $table->timestamps();
 
             $table->foreign('album_id')->references('id')->on('albums');
