@@ -21,4 +21,9 @@ class Challenge extends Model
      * @var array
      */
     protected $fillable = ['title', 'desctiption', 'start_time', 'end_time'];
+
+    public function images()
+    {
+        return $this->belongsToMany(Challenge::class, 'challenges_images', 'challenge_id', 'image_id');
+    }
 }

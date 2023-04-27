@@ -21,4 +21,17 @@ class Image extends Model
      * @var array
      */
     protected $fillable = ['description', 'views'];
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'images_tags', 'image_id', 'tag_id');
+    }
+    public function challenges()
+    {
+        return $this->belongsToMany(Challenge::class, 'challenges_images', 'image_id', 'challenge_id');
+    }
+    public function users_liked()
+    {
+        return $this->belongsToMany(User::class, 'images_likes', 'image_id', 'user_id');
+    }
 }

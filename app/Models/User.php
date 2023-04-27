@@ -58,4 +58,14 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function liked_comments()
+    {
+        return $this->belongsToMany(Comment::class, 'comments_likes', 'user_id', 'comment_id');
+    }
+
+    public function liked_images()
+    {
+        return $this->belongsToMany(Image::class, 'images_likes', 'user_id', 'image_id');
+    }
 }
