@@ -30,7 +30,7 @@ class Comment extends Model
 
     public function image()
     {
-        return $this->hasOne(Image::class);
+        return $this->belongsTo(Image::class)->withDefault();
     }
     public function parent()
     {

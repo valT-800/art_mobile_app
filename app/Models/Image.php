@@ -38,4 +38,12 @@ class Image extends Model
     {
         return $this->belongsToMany(User::class, 'images_saved', 'image_id', 'user_id');
     }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+    public function album()
+    {
+        return $this->belongsTo(Album::class);
+    }
 }
