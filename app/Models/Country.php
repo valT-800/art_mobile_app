@@ -20,4 +20,9 @@ class Country extends Model
      * @var array
      */
     protected $fillable = ['name', 'code'];
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
 }

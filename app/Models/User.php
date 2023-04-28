@@ -73,4 +73,20 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Image::class, 'images_saved', 'user_id', 'image_id');
     }
+    public function level()
+    {
+        return $this->belongsTo(Level::class);
+    }
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+    }
+    public function following_users()
+    {
+        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
+    }
 }

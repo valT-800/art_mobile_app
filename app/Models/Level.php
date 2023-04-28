@@ -21,4 +21,9 @@ class Level extends Model
      * @var array
      */
     protected $fillable = ['title'];
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
 }
