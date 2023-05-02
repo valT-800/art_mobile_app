@@ -21,6 +21,8 @@ Route::apiResource('countries', App\Http\Controllers\Api\CountriesController::cl
 Route::apiResource('images', App\Http\Controllers\Api\ImagesController::class)->only(['index', 'show']);
 Route::apiResource('tags', App\Http\Controllers\Api\TagsController::class)->only(['index', 'show']);
 Route::apiResource('users', App\Http\Controllers\Api\UsersController::class)->only(['index', 'show']);
+
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

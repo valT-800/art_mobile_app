@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Album;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +14,9 @@ class AlbumsController extends Controller
      */
     public function index()
     {
-        $albums = Album::with('user')->where('id', Auth::id())->get();
+        $userId = Auth::id();
+        $user = User::find($userId);
+        $albums = $user->albums()->with('user')->get();
         return view('user.albums.index', compact('albums'));
     }
 
@@ -30,7 +33,9 @@ class AlbumsController extends Controller
      */
     public function store(Request $request)
     {
-        Album::create($request->all())->with('user');
+        $userId = Auth::id();
+        $user = User::find($userId);
+        $album = $user->albums()->create($request->all());
         return redirect('user/albums')->with('success', 'Album added successfully.');
     }
 

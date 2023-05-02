@@ -19,7 +19,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = User::with('user', 'users')->get();
+        $users = User::with('level', 'country', 'albums', 'liked_images', 'saved_images')->get();
         return UserResource::collection($users);
     }
 
@@ -28,7 +28,7 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = User::with('level', 'country', 'albums', 'liked_images', 'saved_images')->post();
     }
 
     /**
@@ -36,7 +36,7 @@ class UsersController extends Controller
      */
     public function show(string $id)
     {
-        $users = User::with('user', 'users')->findOrFail($id);
+        $users = User::with('level', 'country', 'albums', 'liked_images', 'saved_images')->findOrFail($id);
         return new UserResource($users);
     }
 
