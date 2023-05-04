@@ -17,18 +17,27 @@ class ImageResource extends JsonResource
         return [
             'id' => $this->id,
             'description' => $this->description,
-            'album' => $this->album->title,
-            'likes' => $this->users_liked->count(),
-            'saves' => $this->users_saved->count(),
+            'url' => $this->url,
+            'album_title' => $this->album->title,
+            'album_id' => $this->album->id,
+            'users_liked' => $this->users_liked->map(function ($item) {
+                return ['id' => $item['id'], 'username' => $item['username']];
+            }),
+            'users_saved' => $this->users_saved->map(function ($item) {
+                return ['id' => $item['id'], 'username' => $item['username']];
+            }),
             'views' => $this->views,
-            'user' => $this->album->user->name,
+            'user_name' => $this->album->user->name,
+            'user_id' => $this->album->user->id,
             'comments' => $this->comments,
             'challenges' => $this->challenges->map(function ($item) {
-                return $item['title'];
+
+                return ['id' => $item['id'], 'title' => $item['title']];
             }),
             'tags' => $this->tags->map(function ($item) {
                 return $item['tag'];
             }),
+            'created_at' => $this->created_at,
             $this->merge(['language' => $this->language])
         ];
     }

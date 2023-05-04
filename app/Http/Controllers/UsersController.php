@@ -13,7 +13,7 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::all()->sortBy("name");
+        $users = User::all();
         return view('user.users.index', compact('users'));
     }
 }

@@ -20,6 +20,9 @@ class CommentResource extends JsonResource
             'views' => $this->views,
             'user' => $this->user->name,
             'content' => $this->content,
+            'parent' => $this->parent,
+            'created_at' => $this->created_at,
+            'comments' => $this->comments,
             $this->merge(['language' => $this->language])
         ];
     }

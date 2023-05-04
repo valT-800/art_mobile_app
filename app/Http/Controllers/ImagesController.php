@@ -16,7 +16,7 @@ class ImagesController extends Controller
      */
     public function index()
     {
-        $images = Image::with('users_liked', 'users_saved', 'tags')->with('user')->where('id', Auth::id())->get();
+        $images = Image::with('users_liked', 'users_saved', 'tags')->get();
         return view('user.images.index', compact('images'));
     }
 
@@ -25,18 +25,7 @@ class ImagesController extends Controller
      */
     public function create()
     {
-        $albums = Album::pluck('title', 'id');
-        $albums->prepend('---Please select---', 0);     // pirmo masyvo elemento reikšmė bus '---Please select---'
-        $albums->all();
-
-        $tags = Tag::selectRaw()
-            ->orderBy('tag', 'asc')
-            ->pluck('tag', 'id');
-        $tags->prepend('---Please select---', 0);
-        $tags->all();
-
-
-        return view('user.images.form', compact('albums', 'tags'));
+        //
     }
 
     /**
@@ -44,8 +33,7 @@ class ImagesController extends Controller
      */
     public function store(Request $request)
     {
-        Image::create($request->all())->tags()->attach($request->tags)->challenges()->attach($request->challenges)->users_liked()->attach($request->users_liked)->users_saved()->attach($request->users_saved);
-        return redirect('user/images')->with('success', 'Image added successfully.');
+        //
     }
 
     /**
@@ -62,19 +50,7 @@ class ImagesController extends Controller
      */
     public function edit(string $id)
     {
-        $albums = Album::pluck('title', 'id');
-        $albums->prepend('---Please select---', 0);     // pirmo masyvo elemento reikšmė bus '---Please select---'
-        $albums->all();
-
-        $tags = Tag::selectRaw()
-            ->orderBy('tag', 'asc')
-            ->pluck('tag', 'id');
-        $tags->prepend('---Please select---', 0);
-        $tags->all();
-
-        $image = Image::findOrFail($id);
-
-        return view('user.images.form', compact('albums', 'tags'));
+        //
     }
 
     /**
@@ -82,9 +58,7 @@ class ImagesController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $image = Image::findOrFail($id);
-        $image->update($request->all());
-        return redirect('user/images')->with('success', 'Image updated successfully.');
+        //
     }
 
     /**
@@ -92,8 +66,6 @@ class ImagesController extends Controller
      */
     public function destroy(string $id)
     {
-        $image = Image::findOrFail($id);
-        $image->delete();  // įvykdoma SQL užklausa, kuri pašalina duomenis iš DB
-        return redirect('user/images')->with('success', 'Image deleted successfully.');
+        //
     }
 }

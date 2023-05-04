@@ -18,9 +18,10 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'username' => $this->username,
             'password' => $this->password,
-            //'level' => $this->level->title,
-            //'country' => $this->country->name,
+            'level' => $this->level->title,
+            'country' => $this->country->name,
             'city' => $this->city,
             'avatar' => $this->avatar,
             'cover' => $this->cover,
@@ -29,11 +30,15 @@ class UserResource extends JsonResource
             //'following' => $this->following_users->count(),
 
             'albums' => $this->albums->map(function ($item) {
-                return $item['title'];
+                return ['id' => $item['id'], 'title' => $item['title']];
             }),
-            'liked_images' => $this->liked_images,
+            'liked_images' => $this->liked_images->map(function ($item) {
+                return ['id' => $item['id'], 'url' => $item['url']];
+            }),
             //'liked_comments' => $this->liked_comments,
-            'saved_images' => $this->saved_images,
+            'saved_images' => $this->saved_images->map(function ($item) {
+                return ['id' => $item['id'], 'url' => $item['url']];
+            }),
             $this->merge(['language' => $this->language])
         ];
     }

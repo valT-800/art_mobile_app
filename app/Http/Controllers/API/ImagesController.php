@@ -19,7 +19,7 @@ class ImagesController extends Controller
      */
     public function index()
     {
-        $images = Image::with('user', 'images')->get();
+        $images = Image::with('tags', 'challenges', 'users_liked', 'users_saved', 'comments', 'album', 'user')->get();
         return ImageResource::collection($images);
     }
 
@@ -36,8 +36,8 @@ class ImagesController extends Controller
      */
     public function show(string $id)
     {
-        $images = Image::with('user', 'images')->findOrFail($id);
-        return new ImageResource($images);
+        $image = Image::with('tags', 'challenges', 'users_liked', 'users_saved', 'comments', 'album', 'user')->findOrFail($id);
+        return new ImageResource($image);
     }
 
     /**

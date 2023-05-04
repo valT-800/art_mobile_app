@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\user;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\CommentResource;
-use App\Models\Comment;
+use App\Http\Resources\TagResource;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
-class CommentsController extends Controller
+class TagsController extends Controller
 {
 
     public function __construct()
@@ -19,8 +19,8 @@ class CommentsController extends Controller
      */
     public function index()
     {
-        $comments = Comment::with('user', 'parent', 'comments')->get();
-        return CommentResource::collection($comments);
+        $tags = Tag::with('images')->get();
+        return TagResource::collection($tags);
     }
 
     /**
@@ -28,7 +28,7 @@ class CommentsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Tag::create($request->all());
     }
 
     /**
@@ -36,8 +36,8 @@ class CommentsController extends Controller
      */
     public function show(string $id)
     {
-        $comments = Comment::with('user', 'parent', 'comments')->findOrFail($id);
-        return new CommentResource($comments);
+        $tags = Tag::with('images')->findOrFail($id);
+        return new TagResource($tags);
     }
 
     /**

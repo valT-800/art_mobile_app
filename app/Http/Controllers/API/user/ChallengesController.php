@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\user;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\CommentResource;
-use App\Models\Comment;
+use App\Http\Resources\ChallengeResource;
+use App\Models\Challenge;
 use Illuminate\Http\Request;
 
-class CommentsController extends Controller
+class ChallengesController extends Controller
 {
 
     public function __construct()
@@ -19,8 +19,8 @@ class CommentsController extends Controller
      */
     public function index()
     {
-        $comments = Comment::with('user', 'parent', 'comments')->get();
-        return CommentResource::collection($comments);
+        $challenges = Challenge::with('images')->get();
+        return ChallengeResource::collection($challenges);
     }
 
     /**
@@ -28,7 +28,7 @@ class CommentsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Challenge::create($request->all());
     }
 
     /**
@@ -36,8 +36,8 @@ class CommentsController extends Controller
      */
     public function show(string $id)
     {
-        $comments = Comment::with('user', 'parent', 'comments')->findOrFail($id);
-        return new CommentResource($comments);
+        $challenges = Challenge::with('images')->findOrFail($id);
+        return new ChallengeResource($challenges);
     }
 
     /**
@@ -45,7 +45,9 @@ class CommentsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $challenge = Challenge::findOrFail($id);
+        $challenge->update($request->all());
+        return new ChallengeResource($challenge);
     }
 
     /**
@@ -53,6 +55,7 @@ class CommentsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $challenge = Challenge::findOrFail($id);
+        $challenge->delete();
     }
 }

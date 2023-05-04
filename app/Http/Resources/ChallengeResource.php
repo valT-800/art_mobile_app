@@ -20,7 +20,9 @@ class ChallengeResource extends JsonResource
             'description' => $this->description,
             'start_time' => $this->start_time,
             'end_time' => $this->end_time,
-            'images' => $this->images,
+            'images' => $this->images->map(function ($item) {
+                return ['id' => $item['id'], 'url' => $item['url']];
+            }),
             $this->merge(['language' => $this->language])
         ];
     }

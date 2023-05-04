@@ -19,7 +19,7 @@ class CountriesController extends Controller
      */
     public function index()
     {
-        $countries = Country::with('user', 'images')->get();
+        $countries = Country::all();
         return CountryResource::collection($countries);
     }
 
@@ -36,7 +36,7 @@ class CountriesController extends Controller
      */
     public function show(string $id)
     {
-        $countries = Country::with('user', 'images')->findOrFail($id);
+        $countries = Country::findOrFail($id);
         return new CountryResource($countries);
     }
 

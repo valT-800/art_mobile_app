@@ -19,7 +19,7 @@ class TagsController extends Controller
      */
     public function index()
     {
-        $tags = Tag::with('user', 'tags')->get();
+        $tags = Tag::with('images')->get();
         return TagResource::collection($tags);
     }
 
@@ -36,7 +36,7 @@ class TagsController extends Controller
      */
     public function show(string $id)
     {
-        $tags = Tag::with('user', 'tags')->findOrFail($id);
+        $tags = Tag::with('images')->findOrFail($id);
         return new TagResource($tags);
     }
 

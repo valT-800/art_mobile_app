@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\user;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\CommentResource;
-use App\Models\Comment;
+use App\Http\Resources\ImageResource;
+use App\Models\Image;
 use Illuminate\Http\Request;
 
-class CommentsController extends Controller
+class ImagesController extends Controller
 {
 
     public function __construct()
@@ -19,8 +19,8 @@ class CommentsController extends Controller
      */
     public function index()
     {
-        $comments = Comment::with('user', 'parent', 'comments')->get();
-        return CommentResource::collection($comments);
+        $images = Image::with('tags', 'challenges', 'users_liked', 'users_saved', 'comments', 'album', 'user')->get();
+        return ImageResource::collection($images);
     }
 
     /**
@@ -28,7 +28,7 @@ class CommentsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Image::create($request->all());
     }
 
     /**
@@ -36,8 +36,8 @@ class CommentsController extends Controller
      */
     public function show(string $id)
     {
-        $comments = Comment::with('user', 'parent', 'comments')->findOrFail($id);
-        return new CommentResource($comments);
+        $image = Image::with('tags', 'challenges', 'users_liked', 'users_saved', 'comments', 'album', 'user')->findOrFail($id);
+        return new ImageResource($image);
     }
 
     /**
@@ -45,7 +45,10 @@ class CommentsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+
+        $image = Image::findOrFail($id);
+        $image->update($request->all());
+        return new ImageResource($image);
     }
 
     /**
@@ -53,6 +56,7 @@ class CommentsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $image = Image::findOrFail($id);
+        $image->delete();
     }
 }

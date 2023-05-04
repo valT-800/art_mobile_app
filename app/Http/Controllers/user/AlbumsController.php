@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\user;
 
+use App\Http\Controllers\Controller;
 use App\Models\Album;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,7 +15,8 @@ class AlbumsController extends Controller
      */
     public function index()
     {
-        $albums = Album::with('images')->get();
+        $user = User::find(Auth::id());
+        $albums = $user->albums()->with('user', 'images')->get();
         return view('user.albums.index', compact('albums'));
     }
 
@@ -23,7 +25,7 @@ class AlbumsController extends Controller
      */
     public function create()
     {
-        //
+        return view('user.albums.form');
     }
 
     /**
@@ -31,7 +33,9 @@ class AlbumsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = User::find(Auth::id());
+        $user->albums()->create($request->all());
+        return redirect('user/albums')->with('success', 'Album added successfully.');
     }
 
     /**
@@ -48,7 +52,8 @@ class AlbumsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $album = Album::findOrFail($id);
+        return view('user.albums.form', compact('album'));
     }
 
     /**
@@ -57,7 +62,10 @@ class AlbumsController extends Controller
     public function update(Request $request, string $id)
     {
 
-        //
+        $album = Album::findOrFail($id);
+        $album->update($request->all());   // įvykdoma SQL užklausa, kuri atnaujina duomenis DB
+
+        return redirect('user/albums')->with('success', 'Album updated successfully.');
     }
 
     /**
@@ -65,6 +73,8 @@ class AlbumsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $album = Album::findOrFail($id);
+        $album->delete();  // įvykdoma SQL užklausa, kuri pašalina duomenis iš DB
+        return redirect('user/albums')->with('success', 'Album deleted successfully.');
     }
 }

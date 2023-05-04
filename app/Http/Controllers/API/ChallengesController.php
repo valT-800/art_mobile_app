@@ -19,7 +19,7 @@ class ChallengesController extends Controller
      */
     public function index()
     {
-        $challenges = Challenge::with('user', 'images')->get();
+        $challenges = Challenge::with('images')->get();
         return ChallengeResource::collection($challenges);
     }
 
@@ -36,7 +36,7 @@ class ChallengesController extends Controller
      */
     public function show(string $id)
     {
-        $challenges = Challenge::with('user', 'images')->findOrFail($id);
+        $challenges = Challenge::with('images')->findOrFail($id);
         return new ChallengeResource($challenges);
     }
 

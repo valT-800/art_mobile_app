@@ -34,9 +34,12 @@ class Comment extends Model
     }
     public function parent()
     {
-        return $this->hasOne($this::class);
+        return $this->belongsTo($this::class);
     }
-
+    public function comments()
+    {
+        return $this->hasMany($this::class);
+    }
     public function users_liked()
     {
         return $this->belongsToMany(User::class, 'comments_likes', 'comment_id', 'user_id');
