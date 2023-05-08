@@ -30,14 +30,14 @@ class UserResource extends JsonResource
             //'following' => $this->following_users->count(),
 
             'albums' => $this->albums->map(function ($item) {
-                return ['id' => $item['id'], 'title' => $item['title']];
+                return ['id' => $item->id, 'title' => $item->title];
             }),
             'liked_images' => $this->liked_images->map(function ($item) {
-                return ['id' => $item['id'], 'url' => $item['url']];
+                return ['id' => $item->id, 'url' => $item->url];
             }),
             //'liked_comments' => $this->liked_comments,
             'saved_images' => $this->saved_images->map(function ($item) {
-                return ['id' => $item['id'], 'url' => $item['url']];
+                return ['id' => $item->id, 'url' => $item->url];
             }),
             $this->merge(['language' => $this->language])
         ];

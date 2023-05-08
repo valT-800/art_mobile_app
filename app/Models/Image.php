@@ -20,7 +20,7 @@ class Image extends Model
      *
      * @var array
      */
-    protected $fillable = ['description', 'views'];
+    protected $fillable = ['description', 'views', 'url'];
 
     public function tags()
     {
@@ -45,5 +45,9 @@ class Image extends Model
     public function album()
     {
         return $this->belongsTo(Album::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

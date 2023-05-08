@@ -18,24 +18,27 @@ class ImageResource extends JsonResource
             'id' => $this->id,
             'description' => $this->description,
             'url' => $this->url,
-            'album_title' => $this->album->title,
-            'album_id' => $this->album->id,
+
+            'album' => $this->album ? [
+                'album_title' => $this->album->title,
+                'album_id' => $this->album->id
+            ] : null,
             'users_liked' => $this->users_liked->map(function ($item) {
-                return ['id' => $item['id'], 'username' => $item['username']];
+                return ['id' => $item->id, 'username' => $item->username];
             }),
             'users_saved' => $this->users_saved->map(function ($item) {
-                return ['id' => $item['id'], 'username' => $item['username']];
+                return ['id' => $item->id, 'username' => $item->username];
             }),
             'views' => $this->views,
-            'user_name' => $this->album->user->name,
-            'user_id' => $this->album->user->id,
+            'username' => $this->user->username,
+            'user_id' => $this->user->id,
             'comments' => $this->comments,
             'challenges' => $this->challenges->map(function ($item) {
 
-                return ['id' => $item['id'], 'title' => $item['title']];
+                return ['id' => $item->id, 'title' => $item->title];
             }),
             'tags' => $this->tags->map(function ($item) {
-                return $item['tag'];
+                return ['id' => $item->id, 'tag' => $item->tag];
             }),
             'created_at' => $this->created_at,
             $this->merge(['language' => $this->language])
