@@ -18,7 +18,7 @@ class TagResource extends JsonResource
             'id' => $this->id,
             'tag' => $this->tag,
             'images' => $this->images->map(function ($item) {
-                return ['id' => $item['id'], 'url' => $item['url']];
+                return ['id' => $item->id, 'url' => $item->url];
             }),
             $this->merge(['language' => $this->language])
         ];

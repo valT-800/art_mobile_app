@@ -21,7 +21,7 @@ class CommentsController extends Controller
      */
     public function index()
     {
-        $comments = Comment::with('user', 'parent', 'comments')->get();
+        $comments = Comment::with('parent', 'comments')->get();
         return CommentResource::collection($comments);
     }
 
@@ -39,7 +39,7 @@ class CommentsController extends Controller
      */
     public function show(string $id)
     {
-        $comments = Comment::with('user', 'parent', 'comments')->findOrFail($id);
+        $comments = Comment::with('parent', 'comments')->findOrFail($id);
         return new CommentResource($comments);
     }
 
