@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->foreignId('album_id')->nullable();
             $table->bigInteger('views')->unsigned()->nullable();
             $table->timestamps();

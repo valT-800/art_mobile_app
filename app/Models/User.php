@@ -83,15 +83,15 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Country::class);
     }
-    /*public function followers()
+    public function followers()
     {
-        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+        return $this->belongsToMany(User::class, 'followers', 'following_id', 'user_id');
     }
-    
-    public function following_users()
+
+    public function following()
     {
-        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
-    }*/
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'following_id');
+    }
     public function albums()
     {
         return $this->hasMany(Album::class);
@@ -99,5 +99,9 @@ class User extends Authenticatable
     public function images()
     {
         return $this->hasMany(Image::class);
+    }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

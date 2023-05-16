@@ -35,16 +35,24 @@ class ImagesController extends Controller
      */
     public function store(Request $request)
     {
-        /*$validator = Validator::make($request->all(), ['image' => ['required', File::image()->max(2 * 1024)]]);
-        if ($validator->fails()) return response()->json($validator->messages());*/
-        $path = $request->file('image')->store('images');
-        Image::create([
-            //'description' => $request->description,
+        $validator = Validator::make($request->all(), ['image' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048']);
+        if ($validator->fails()) {
+            return response()->json(['isSuccess' => false, 'message' => $validator->messages()]);
+        }
+        $file = $request->file('image');
+        $extension = $request->image->getClientOriginalExtension();
+        $fileName = $file . '.' . uniqid() . '.' . $extension;
+        $path = $file->move('images', $fileName);
+        $image = Image::create([
+            'description' => $request->description,
             'url' => $path,
         ]);
-        //$album = $request->album() ?  $request->album() : Album::first();
-
-        //$album->images()->save($image);
+        if ($request->album_id) {
+            $album = Album::find($request->album_id);
+            $album->images()->save($image);
+        }
+        $user = User::find(Auth::id());
+        $user->images()->save($image);
 
         return response()->json(['isSuccess' => true, 'url' => $path]);
     }
@@ -54,7 +62,7 @@ class ImagesController extends Controller
      */
     public function show(string $id)
     {
-        $image = Image::with('tags', 'challenges', 'users_liked', 'users_saved', 'comments')->findOrFail($id);
+        $image = Image::with('tags', 'challenges', 'users_liked', 'users_saved')->findOrFail($id);
         return new ImageResource($image);
     }
 
@@ -65,7 +73,23 @@ class ImagesController extends Controller
     {
 
         $image = Image::findOrFail($id);
-        $image->update($request->all());
+        $image->update([
+            'description' => $request->description,
+            'views' => $request->views,
+        ]);
+        if ($request->new_album_id) {
+            $image->album()->delete();
+            $newAlbum = Album::find($request->new_album_id);
+            $newAlbum->images()->save($image);
+        }
+        $user = User::find(Auth::id());
+        if ($request->user_liked) {
+            $user->liked_images()->save($image);
+        }
+        if ($request->user_saved) {
+            $user->saved_images()->save($image);
+        }
+
         return new ImageResource($image);
     }
 

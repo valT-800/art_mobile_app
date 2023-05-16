@@ -5,7 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ImageResource;
 use App\Models\Image;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ImagesController extends Controller
 {
@@ -19,7 +22,7 @@ class ImagesController extends Controller
      */
     public function index()
     {
-        $images = Image::with('tags', 'challenges', 'users_liked', 'users_saved', 'comments')->get();
+        $images = Image::with('tags', 'challenges', 'users_liked', 'users_saved')->get();
         return ImageResource::collection($images);
     }
 
@@ -36,7 +39,7 @@ class ImagesController extends Controller
      */
     public function show(string $id)
     {
-        $image = Image::with('tags', 'challenges', 'users_liked', 'users_saved', 'comments')->findOrFail($id);
+        $image = Image::with('tags', 'challenges', 'users_liked', 'users_saved')->findOrFail($id);
         return new ImageResource($image);
     }
 

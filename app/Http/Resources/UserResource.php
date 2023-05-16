@@ -20,17 +20,23 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'username' => $this->username,
             'password' => $this->password,
-            'level' => $this->level->title,
-            'country' => $this->country->name,
+            'level' => $this->level ? $this->level->title : null,
+            'country' => $this->country ? $this->country->name : null,
             'city' => $this->city,
             'avatar' => $this->avatar,
             'cover' => $this->cover,
             'points' => $this->points,
-            //'followers' => $this->followers->count(),
-            //'following' => $this->following_users->count(),
-
+            'followers' => $this->followers->map(function ($item) {
+                return ['id' => $item->id, 'username' => $item->username];
+            }),
+            'following' => $this->following->map(function ($item) {
+                return ['id' => $item->id, 'username' => $item->username];
+            }),
             'albums' => $this->albums->map(function ($item) {
                 return ['id' => $item->id, 'title' => $item->title];
+            }),
+            'images' => $this->albums->map(function ($item) {
+                return ['id' => $item->id, 'url' => $item->url];
             }),
             'liked_images' => $this->liked_images->map(function ($item) {
                 return ['id' => $item->id, 'url' => $item->url];

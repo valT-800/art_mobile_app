@@ -4,8 +4,11 @@ namespace App\Http\Controllers\API\user;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TagResource;
+use App\Models\Image;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class TagsController extends Controller
 {
@@ -28,7 +31,22 @@ class TagsController extends Controller
      */
     public function store(Request $request)
     {
-        Tag::create($request->all());
+        $validator = Validator::make($request->all(), [
+            'tag' => ['required', 'string', Rule::unique('tags')],
+            'image_id' => 'required|exists:images,id',
+
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['isSuccess' => false, 'message' => $validator->messages()]);
+        }
+        $tag = new Tag([
+            'tag' => $request->tag,
+        ]);
+
+        $image = Image::findOrFail($request->image_id);
+        $image->tags()->save($tag);
+
+        return response()->json(['isSuccess' => true, 'message' => 'Succesfully posted']);
     }
 
     /**

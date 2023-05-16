@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
+use App\Models\Image;
 use Illuminate\Http\Request;
 
 class CommentsController extends Controller
@@ -22,7 +23,12 @@ class CommentsController extends Controller
         $comments = Comment::with('parent', 'comments')->get();
         return CommentResource::collection($comments);
     }
-
+    public function getbyImageId(string $id)
+    {
+        $image = Image::find($id);
+        $comments = $image->comments()->with('parent', 'comments')->get();
+        return CommentResource::collection($comments);
+    }
     /**
      * Store a newly created resource in storage.
      */

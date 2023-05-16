@@ -20,8 +20,8 @@ class ImageResource extends JsonResource
             'url' => $this->url,
 
             'album' => $this->album ? [
-                'album_title' => $this->album->title,
-                'album_id' => $this->album->id
+                'title' => $this->album->title,
+                'id' => $this->album->id
             ] : null,
             'users_liked' => $this->users_liked->map(function ($item) {
                 return ['id' => $item->id, 'username' => $item->username];
@@ -30,8 +30,11 @@ class ImageResource extends JsonResource
                 return ['id' => $item->id, 'username' => $item->username];
             }),
             'views' => $this->views,
-            'username' => $this->user->username,
-            'user_id' => $this->user->id,
+            'user' => [
+                'username' => $this->user->username,
+                'profile_photo' => $this->user->profile_photo_url,
+                'id' => $this->user->id
+            ],
             'comments' => $this->comments,
             'challenges' => $this->challenges->map(function ($item) {
 

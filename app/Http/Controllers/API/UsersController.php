@@ -16,7 +16,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = User::with('albums', 'liked_images', 'saved_images')->get();
+        $users = User::with('albums', 'images', 'liked_images', 'saved_images', 'followers', 'following')->get();
 
         return UserResource::collection($users);
     }
@@ -40,7 +40,7 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        $user = User::with('albums', 'liked_images', 'saved_images')->findOrFail($id);
+        $user = User::with('albums', 'images', 'liked_images', 'saved_images', 'followers', 'following')->findOrFail($id);
         return new UserResource($user);
     }
 

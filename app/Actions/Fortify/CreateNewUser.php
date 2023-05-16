@@ -34,11 +34,6 @@ class CreateNewUser implements CreatesNewUsers
             'password' => Hash::make($input['password']),
             //'api_token' => Str::random(60),
         ]);
-        $album = Album::crete([
-            'title' => 'My images',
-            'description' => 'Default auto created album',
-        ]);
-        $user->albums->save($album);
         return $user;
     }
 }

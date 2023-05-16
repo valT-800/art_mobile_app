@@ -25,20 +25,20 @@ class Comment extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class)->withDefault();
+        return $this->belongsTo(User::class);
     }
 
     public function image()
     {
-        return $this->belongsTo(Image::class)->withDefault();
+        return $this->belongsTo(Image::class);
     }
     public function parent()
     {
-        return $this->belongsTo($this::class);
+        return $this->belongsTo($this::class, 'parent_id');
     }
     public function comments()
     {
-        return $this->hasMany($this::class);
+        return $this->hasMany($this::class, 'parent_id');
     }
     public function users_liked()
     {

@@ -16,7 +16,7 @@ class ImagesController extends Controller
      */
     public function index()
     {
-        $images = Image::with('users_liked', 'users_saved', 'tags')->get();
+        $images = Image::with('challenges', 'users_liked', 'users_saved', 'tags')->get();
         return view('user.images.index', compact('images'));
     }
 

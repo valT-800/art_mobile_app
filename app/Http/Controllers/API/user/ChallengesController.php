@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ChallengeResource;
 use App\Models\Challenge;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ChallengesController extends Controller
 {
@@ -28,7 +29,20 @@ class ChallengesController extends Controller
      */
     public function store(Request $request)
     {
-        Challenge::create($request->all());
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'description' => 'required|string'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['isSuccess' => false, 'message' => $validator->messages()]);
+        }
+        $challenge = new Challenge([
+            'title' => $request->title,
+            'description' => $request->description
+        ]);
+        $challenge->save();
+
+        return response()->json(['isSuccess' => true, 'message' => 'Succesfully posted']);
     }
 
     /**

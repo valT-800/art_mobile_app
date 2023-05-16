@@ -16,9 +16,16 @@ class CommentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'likes' => $this->users_liked->count(),
             'views' => $this->views,
-            'user' => $this->user->name,
+            'image_id' => $this->image_id,
+            'user' => [
+                'username' => $this->user->username,
+                'profile_photo' => $this->user->profile_photo_url,
+                'id' => $this->user->id
+            ],
+            'users_liked' => $this->users_liked->map(function ($item) {
+                return ['id' => $item->id, 'username' => $item->username];
+            }),
             'content' => $this->content,
             'parent' => $this->parent,
             'created_at' => $this->created_at,

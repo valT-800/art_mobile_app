@@ -19,7 +19,7 @@ class AlbumsController extends Controller
      */
     public function index()
     {
-        $albums = Album::with('user', 'images')->get();
+        $albums = Album::with('images')->get();
         return AlbumResource::collection($albums);
     }
 
@@ -36,7 +36,7 @@ class AlbumsController extends Controller
      */
     public function show(string $id)
     {
-        $albums = Album::with('user', 'images')->findOrFail($id);
+        $albums = Album::with('images')->findOrFail($id);
         return new AlbumResource($albums);
     }
 
