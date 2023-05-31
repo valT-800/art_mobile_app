@@ -7,10 +7,20 @@ import * as SecureStore from 'expo-secure-store';
 
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { useColorScheme } from 'react-native';
+import {api} from "./services/api_base";
+import { CustomColorSchemeContext } from "./screens/CustomColorScheme";
 
 export default function Routes() {
   const { user, setUser, login, logout } = useContext(AuthContext)
   const [loading, setLoading] = useState(true);
+  
+  const { colorScheme, setCustomColorScheme } = useContext(CustomColorSchemeContext);
+
+  // Add any other logic or state you need for your color scheme selection
+
+  const onColorSchemeChange = (scheme) => {
+    setCustomColorScheme(scheme);
+  };
 
   /*useEffect(() => {
     const getUserFromStorage = async () => {
@@ -30,6 +40,7 @@ export default function Routes() {
 
   useEffect(() => {
     // check if the user is logged in or not
+    
     SecureStore.getItemAsync('user')
       .then(userString => {
         if (userString) {
@@ -40,13 +51,27 @@ export default function Routes() {
           setUser(userObject);
           
         }
+      if(user){
+        api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+        api.get('api/user')
+        .then(response => {
+          console.log("User ", response.data.data)
+        })
+        .catch(error => {
+          console.log("Error", error.response);
+          SecureStore.deleteItemAsync('user');
+          setUser(null);
+        })
+      }
+    
         setLoading(false);
         //SecureStore.deleteItemAsync('user');
       })
       .catch(err => {
-        console.log(err);
+        console.log("Error", err);
+        setLoading(false);
       })
-  }, []);
+  }, [loading]);
 
   if (loading) {
     return (
@@ -55,9 +80,9 @@ export default function Routes() {
       </View>
     )
   }
-
+  
   return (
-    <NavigationContainer theme={useColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme }>
       {user ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
   );

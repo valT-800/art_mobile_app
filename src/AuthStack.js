@@ -4,6 +4,7 @@ import { Button, Text, View, TextInput, TouchableOpacity } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "./screens/HomeScreen";
+import CustomButton from "./components/CustomButton";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -31,7 +32,7 @@ function LoginScreen({ navigation: {navigate} }) {
         placeholder="Password"
         secureTextEntry={true}
       />
-      <Button title="Login" onPress={() => login(email, password)}/>
+      <CustomButton title="Login" onPress={() => login(email, password)}/>
       {/*<Button title="Go to Register" onPress={() => navigate('Register')}/>*/}
       <TouchableOpacity onPress={() => navigate('Register')}>
                 <Text>No account? Sign up </Text>
@@ -85,14 +86,11 @@ const { register, error } = useContext(AuthContext);
         placeholder="Confirm password"
         secureTextEntry={true}
       />
-      <Button title="Register" onPress={() => register(name, username, email, password, confirmation_password)}/>
+      <CustomButton title="Register" onPress={() => register(name, username, email, password, confirmation_password)}/>
 
       <TouchableOpacity onPress={() => navigate('Login')}>
           <Text>Already have an account? Login </Text>
       </TouchableOpacity>
-      {/*<Button title="Go to Login" onPress={() => navigate('Login')} />
-      
-       <Button title="Go back" onPress={() => goBack()} /> */}
     </View>
   );
 }

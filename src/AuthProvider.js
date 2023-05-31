@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import api from './services/api_base';
+import {api} from './services/api_base';
 //api.defaults.baseURL = 'http://192.168.1.103:8000';
 export const AuthContext = React.createContext({});
 
@@ -17,7 +17,7 @@ export const AuthProvider = ({children}) => {
         setUser,
         error,
         register: (name, username, email, password, confirmation_password) => {
-            api.post('/api/register',  {
+            api.post('api/register',  {
                 name,
                 username,
                 email,
@@ -45,7 +45,7 @@ export const AuthProvider = ({children}) => {
             })
         },
         login: (email, password) => {
-          api.post('/api/login', {
+          api.post('api/login', {
             email,
             password,
           })
@@ -74,7 +74,7 @@ export const AuthProvider = ({children}) => {
         },     
         logout: () => {
           api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-          api.post('/api/logout')
+          api.post('api/logout')
           .then(response => {
             console.log("Logout response: ", response)
             setUser(null);
