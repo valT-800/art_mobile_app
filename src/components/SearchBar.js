@@ -1,8 +1,9 @@
 import { Entypo, Feather } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, TextInput, View, Keyboard, Button } from "react-native";
+import CustomButton from "./CustomButton";
 
-const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setCLicked}) => {
+const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setClicked}) => {
   return (
     <View style={styles.container}>
       <View
@@ -39,13 +40,13 @@ const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setCLicked}) => {
       {/* cancel button, depending on whether the search bar is clicked or not */}
       {clicked && (
         <View>
-          <Button
+          <CustomButton
             title="Cancel"
             onPress={() => {
               Keyboard.dismiss();
               setClicked(false);
             }}
-          ></Button>
+          ></CustomButton>
         </View>
       )}
     </View>
@@ -56,6 +57,7 @@ export default SearchBar;
 // styles
 const styles = StyleSheet.create({
   container: {
+    paddingTop: 30,
     margin: 15,
     justifyContent: "flex-start",
     alignItems: "center",
@@ -64,7 +66,7 @@ const styles = StyleSheet.create({
 
   },
   searchBar__unclicked: {
-    padding: 10,
+    padding: 7,
     flexDirection: "row",
     width: "95%",
     backgroundColor: "#d9dbda",
@@ -72,7 +74,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   searchBar__clicked: {
-    padding: 10,
+    padding: 7,
     flexDirection: "row",
     width: "80%",
     backgroundColor: "#d9dbda",
@@ -81,7 +83,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   input: {
-    fontSize: 20,
+    fontSize: 16,
     marginLeft: 10,
     width: "90%",
   },
