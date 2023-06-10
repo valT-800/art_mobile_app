@@ -20,7 +20,7 @@ class CommentResource extends JsonResource
             'image_id' => $this->image_id,
             'user' => [
                 'username' => $this->user->username,
-                'profile_photo' => $this->user->profile_photo_url,
+                'profile_photo_url' => $this->user->profile_photo_url,
                 'id' => $this->user->id
             ],
             'users_liked' => $this->users_liked->map(function ($item) {
@@ -28,9 +28,42 @@ class CommentResource extends JsonResource
             }),
             'content' => $this->content,
             'parent' => $this->parent,
-            'created_at' => $this->created_at,
-            'comments' => $this->comments,
+            'created_at' => $this->getTimeDifference($this->created_at->timestamp),
+            'comments' => $this->comments->map(function ($item) {
+                return new self($item);
+            }),
             $this->merge(['language' => $this->language])
         ];
+    }
+    private function getTimeDifference($timestamp)
+    {
+
+        $now = time();  // Current timestamp
+        $difference = $now - $timestamp;  // Time difference in seconds
+
+        if ($difference < 60) {
+            // Less than a minute
+            return $difference . " seconds";
+        } elseif ($difference < 3600) {
+            // Less than an hour
+            $minutes = floor($difference / 60);
+            return $minutes . " minutes";
+        } elseif ($difference < 86400) {
+            // Less than a day
+            $hours = floor($difference / 3600);
+            return $hours . " hours";
+        } elseif ($difference < 604800) {
+            // Less than a week
+            $days = floor($difference / 86400);
+            return $days . " days";
+        } elseif ($difference < 2592000) {
+            // Less than a month
+            $weeks = floor($difference / 604800);
+            return $weeks . " weeks";
+        } else {
+            // More than a month
+            $months = floor($difference / 2592000);
+            return $months . " months";
+        }
     }
 }
