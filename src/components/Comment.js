@@ -3,53 +3,52 @@ import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from
 import CustomIcon from "./CustomIcon";
 import User from "./User";
 import Divider from "./Divider";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import NormalText from "./NormalText";
 import OtherText from "./OtherText";
 import { api } from "../services/api_base";
+import { AuthContext } from "../AuthProvider";
+import commentIsLiked from "../utils/commentIsLiked";
+import unlikeComment from "../utils/unlikeComment";
+import likeComment from "../utils/likeComment";
 
-export default function Comment({item, liked}){
+export default function Comment({item, setParent, setContent}){
 
+  const{user} =useContext(AuthContext)
   const [comment, setComment]=useState(item)
-
-  const navigation = useNavigation();
+  const[liked, setLiked] = useState(false)
   const [full, setFull]=useState(false)
 
-  const likeComment = (comment_id)=>{
-
-    api.put(`api/user/comments/${comment_id}`, {user_liked: true})
-    .then(response => {
-      setComment(response.data.data)
-    })
-    .catch(error => {
-      console.log("Error", error.response);
-
-    })
-  }
-  const unlikeComment = (comment_id)=>{
-    setLoading(true)
-    api.put(`api/user/comments/${comment_id}`, {user_unliked: true})
-    .then(response => {
-      setComment(response.data.data)
-    })
-    .catch(error => {
-      console.log("Error", error.response);
-
-    })
-  }
+  useEffect(()=>{
+    setLiked(commentIsLiked(comment, user.id))
+  }, [liked])
   
     return(
+      
       <View>
           <User user={comment.user}></User>
-          <TouchableOpacity onPress={()=> setFull(true)}>
+          <TouchableOpacity onPress={()=> {setFull(!full)
+            setParent(comment)
+            setContent('@'+comment.user.username)
+          }}>
               <View style = {styles.comment}>
                 <View>
                   <NormalText text={comment.content}/>
                   {comment.comments && <OtherText text={"Comments "+comment.comments.length}/>}
                 </View>
                 <View style = {{flexDirection: 'row'}}>
-                {liked ? <CustomIcon name='heart' size={15} event={()=>unlikeComment(comment.id)}/>
-              : <CustomIcon name='heart-outline' size={15} event={()=>likeComment(comment.id)}/>}
+                {liked ? <CustomIcon name='heart' size={15} event={async ()=>{
+                  let result = await unlikeComment(comment.id)
+                  console.log(result)
+                  setComment(result)
+                  setLiked(false)
+                  }}/>
+              : <CustomIcon name='heart-outline' size={15} event={async ()=>{
+                let result = await likeComment(comment.id)
+                console.log(result)
+                setComment(result)
+                setLiked(true)
+                }}/>}
                   <NormalText text = {comment.users_liked ? comment.users_liked.length : 0}></NormalText>
                 </View>
               </View>
@@ -61,12 +60,10 @@ export default function Comment({item, liked}){
           data={comment.comments}
           renderItem={({item}) => {
             return(
-              <View>
-              <View style = {styles.comment}>
-                <NormalText text={item.content}/>
-                <CustomIcon name = 'heart-outline' size={15}></CustomIcon>
-              </View>
-            <Divider/>
+              <View style={{marginLeft: 20}}>
+                <Divider/>
+                <Comment item={item} setParent={setParent} setContent={setContent}></Comment>
+                   
             </View>
             )}}
             />

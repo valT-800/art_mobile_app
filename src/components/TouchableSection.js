@@ -10,7 +10,7 @@ const TouchableSection=({title, onPress, pressed})=>{
             <TouchableOpacity onPress = {onPress}>
                 <NormalText text={title}/>      
             </TouchableOpacity>
-            {pressed==title && <View style={{height: 5, borderRadius: 10, borderColor: colors.text }}></View>}
+            {pressed==title && <View style={{height: 4, borderRadius: 10, borderColor: colors.text, borderWidth: 2, alignSelf:'stretch', width: "100%" }}></View>}
         </View>
     )
 }

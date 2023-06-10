@@ -4,7 +4,6 @@ import { useTheme } from '@react-navigation/native';
 
 // Black background and white text in light theme, inverted on dark theme
 function OtherText({text}) {
-  const { colors } = useTheme();
 
   return (
       <Text style={styles.text}>{text}</Text>

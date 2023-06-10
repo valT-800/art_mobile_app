@@ -4,7 +4,7 @@ import { TouchableOpacity, View } from 'react-native';
 import NormalText from './NormalText';
 import Divider from './Divider';
 
-const TouchableListItem = ({onPress, title}) => {
+export default TouchableListItem = ({onPress, title}) => {
 
   return (
     <View>
@@ -14,4 +14,3 @@ const TouchableListItem = ({onPress, title}) => {
   );
 };
 
-export default TouchableListItem;

@@ -1,38 +1,96 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   FlatList,
   SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
 import NormalText from "./NormalText";
 import BoldText from "./BoldText";
+import { useNavigation } from "@react-navigation/native";
+import getUsers from "../utils/getUsers";
+import getAlbums from "../utils/getAlbums";
+import getChallenges from "../utils/getChallenges";
+import TouchableSection from "./TouchableSection";
+import User from "./User";
+import Challenge from "./Challenge";
 
 // definition of the Item, which will be rendered in the FlatList
-const Item = ({ title, description }) => (
+const Item = ({item, onPress}) => (
+   
   <View style={styles.item}>
-    <BoldText text={title}/>
-    <NormalText text={description}/>
+    <TouchableOpacity onPress={onPress}>
+    <BoldText text={item.title}/>
+    <NormalText text={item.description}/>
+    </TouchableOpacity>
   </View>
 );
 
 // the filter
-const List = ({searchPhrase, setClicked, data}) => {
-  const renderItem = ({ item }) => {
+const List = ({searchPhrase, setClicked, data, setData}) => {
+  
+  const[pressedSection, setPressedSection]=useState('Users')
+  const navigation = useNavigation()
+
+  const renderAlbums = ({ item }) => {
     // when no input, show all
-    if (searchPhrase === "") {
-      return <Item title={item.title} description={item.description} />;
+    if (searchPhrase.trim() === "") {
+      return <Item item={item} onPress={()=>navigation.navigate('Album', {id: item.id })} />;
     }
-    // filter of the title
-    if (item.title.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
-      return <Item title={item.title} description={item.description} />;
+    else{
+      // filter of the title
+    if (item.title && item.title.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
+      return <Item item={item} onPress={()=>navigation.navigate('Album', {id: item.id })}/>;
     }
     // filter of the description
-    if (item.description.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
-      return <Item title={item.title} description={item.description} />;
+    if (item.description && item.description.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
+      return <Item item={item} onPress={()=>navigation.navigate('Album', {id: item.id })}/>;
     }
+    }
+    
   };
+  const renderChallenges = ({ item }) => {
+    
+      // filter of the title
+    if (item.title && item.title.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
+      return <Challenge challenge={item} />;
+    }
+    // filter of the description
+    if (item.description && item.description.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
+      return <Challenge challenge={item} />;
+    }
+    
+  };
+  const renderUsers = ({ item }) => {
+      // filter of the title
+    if (item.name && item.name.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
+      return <User user={item} />;
+    }
+    // filter of the description
+    if (item.username && item.username.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
+      return <User user={item} />;
+    }
+    if (item.email && item.email.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
+      return <User user={item} />;
+    }
+    
+  };
+
+  const renderItem=({item})=>{
+    if (pressedSection=='Albums') return renderAlbums({item})
+    if (pressedSection=='Challenges') return renderAlbums({item})
+    if (pressedSection=='Users') return renderUsers({item})
+  }
+  
+  useEffect(()=>{
+    fetchData=async()=>{
+      let response = await getUsers()
+      setData(response)
+    }
+    fetchData()
+  },[])
 
   return (
     <SafeAreaView style={styles.list__container}>
@@ -41,11 +99,40 @@ const List = ({searchPhrase, setClicked, data}) => {
           setClicked(false);
         }}
       >
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-        />
+        <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'center', width: '100%', padding:15}}>
+            <TouchableSection title = 'Users' 
+            onPress={async() => {
+              setData([])
+              setPressedSection('Users')
+              let response = await getUsers();
+              setData(response)
+            }} 
+            pressed = {pressedSection}/>
+            <TouchableSection title = 'Albums'
+            onPress={async() => {
+              setData([])
+              setPressedSection('Albums')
+              let response = await getAlbums()
+              console.log(response)
+              setData(response)
+            }} 
+            pressed = {pressedSection}/>
+            <TouchableSection title = 'Challenges'
+            onPress={async() => {
+              setData([])
+              setPressedSection('Challenges')
+              let response = await getChallenges()
+              setData(response)
+            }} 
+             pressed = {pressedSection}/>
+          </View>
+          
+          <FlatList
+              data={data}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+          />
+        
       </View>
     </SafeAreaView>
   );

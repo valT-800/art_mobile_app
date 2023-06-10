@@ -1,5 +1,4 @@
 import { useNavigation, useTheme } from "@react-navigation/native";
-import { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View, Text, ImageBackground} from "react-native";
 import { baseURL } from "../services/api_base";
 

@@ -25,7 +25,7 @@ const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setClicked}) => {
           style={styles.input}
           placeholder="Search"
           value={searchPhrase}
-          onChangeText={setSearchPhrase}
+          onChangeText={(text)=>setSearchPhrase(text)}
           onFocus={() => {
             setClicked(true);
           }}
@@ -44,6 +44,7 @@ const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setClicked}) => {
             title="Cancel"
             onPress={() => {
               Keyboard.dismiss();
+              setSearchPhrase("")
               setClicked(false);
             }}
           ></CustomButton>

@@ -8,7 +8,7 @@ const User =({user})=>{
     return(
         <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}} onPress={()=>navigation.navigate('User', {id: user.id})}>
             <Image
-              source={user.profile_photo}
+              source={user.profile_photo_url}
               style={{width: 25, height: 25, borderRadius: 20, borderColor: 'gray', borderWidth: 1, margin: 5}}></Image>
             <NormalText text={user.username}/>
         </TouchableOpacity>

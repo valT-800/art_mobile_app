@@ -16,7 +16,7 @@ import AlbumScreen from "./screens/albums/AlbumScreen";
 import ChallengesScreen from "./screens/challenges/ChallengesScreen";
 import ChallengeScreen from "./screens/challenges/ChallengeScreen";
 import CommentsScreen from "./screens/comments/CommentsScreen";
-import { useNavigation, useTheme } from "@react-navigation/native";
+import { useTheme } from "@react-navigation/native";
 import CustomIcon from "./components/CustomIcon";
 import EditProfileScreen from "./screens/user/EditProfileScreen";
 import PostScreen from "./screens/posts/PostScreen";
