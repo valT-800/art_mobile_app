@@ -1,6 +1,6 @@
 
 import React, { useContext, useEffect, useState } from "react";
-import { Button, SafeAreaView, Text, TouchableHighligh, FlatList, TouchableHighlight, View, TouchableOpacity, StyleSheet, TextInput } from "react-native";
+import { Button, SafeAreaView, Text, TouchableHighligh, FlatList, TouchableHighlight, View, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from "react-native";
 import { Image } from "expo-image";
 import {api} from "../../services/api_base";
 import { AuthContext } from "../../AuthProvider";
@@ -10,51 +10,48 @@ import CustomInput from "../../components/CustomInput";
 
 function EditProfileScreen({navigation: {navigate, setOptions}}){
 
-  const { user, logout } = useContext(AuthContext)
-  const[loggedUser, setLoggedUser] = useState([])
+  const { user, update } = useContext(AuthContext)
+  const[loggedUser, setLoggedUser] = useState({})
   const[name, setName] = useState('')
   const[username, setUsername] = useState('')
   const[email, setEmail] = useState('')
-
-  const updateUserInfo =()=>{
-    api.put(`/api/user/users/${loggedUser.id}`, {name, username, email})
-      .then(response => {
-        
-        console.log("User ", response.data)
-        setLoggedUser(response.data);
-      })
-      .catch(error => {
-        console.log("Error", error.response);
-      })
+  const [loading, setLoading] =useState(true)
+  const updateUserInfo =async()=>{
+    
+    update(name, username, email)
+    setLoading(true)
   }
 
-  const setUser=()=>{
-    setName(loggedUser.name);
-    setEmail(loggedUser.email);
-    setUsername(loggedUser.username)
+  const setUser=(user)=>{
+    setName(user.name);
+    setEmail(user.email);
+    setUsername(user.username)
   }
   useEffect(() => {
     api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
     
-    api.get('/api/user')
+    api.get('api/user')
       .then(response => {
         
         console.log("User ", response.data)
-        setLoggedUser(response.data);
-        setUser();
-
+        setLoggedUser(response.data.data);
+        setUser(response.data.data);
+        setLoading(false)
       })
       .catch(error => {
         console.log("Error", error.response);
+        setLoading(false)
       })
       setOptions({
         headerRight: () =>
         <CustomIcon name='checkmark' size = {30} event={()=>updateUserInfo()}></CustomIcon>
         });    
-  }, []);
+  }, [loading]);
 
     return(
         <SafeAreaView style = {styles.container}>
+          {loading ? <ActivityIndicator/> :
+          <View style = {{margin: 15, width: '100%', alignItems:'center'}}>
           <View style = {{alignItems:'center', padding:10}}>
             <Image
             source={loggedUser.profile_photo_url}
@@ -62,33 +59,25 @@ function EditProfileScreen({navigation: {navigate, setOptions}}){
             </Image>
             <TouchableOpacity><Text>Edit picture</Text></TouchableOpacity>
         </View>
-        <CustomInput
-          onChangeText={text=>setName(text)}
-          placeholder="Name"
-          textContentType='name'
-          value={name}
-        />
-            <TextInput
-                style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1, padding: 8, marginTop: 24 }}
+            <CustomInput
                 onChangeText={text=>setName(text)}
                 placeholder="Name"
                 textContentType='name'
                 value={name}
             />
-            <TextInput
-                style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1, padding: 8, marginTop: 24 }}
+            <CustomInput
                 onChangeText={text=>setUsername(text)}
                 placeholder="Username"
-                textContentType='username'
+                textContentType='nickname'
                 value={username}
             />
-            <TextInput
-                style={{ height: 40, width: 300, borderColor: 'gray', borderWidth: 1, padding: 8, marginTop: 24 }}
+            <CustomInput
                 onChangeText={text=>setEmail(text)}
                 placeholder="Email"
-                textContentType='email'
+                textContentType='emailAddress'
                 value={email}
             />
+            </View>}
         </SafeAreaView>
     )
 }

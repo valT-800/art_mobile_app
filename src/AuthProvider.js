@@ -39,9 +39,8 @@ export const AuthProvider = ({children}) => {
                 SecureStore.setItemAsync('user', JSON.stringify(userResponse));
             })
             .catch(error => {
-                console.log('Error:', error);
-                const key = Object.keys(error.response.data.errors)[0];
-                setError(error.response.data.errors[key][0]);
+              console.log('Register error:', error.response.data);
+              setError(error.response.data);
             })
         },
         login: (email, password) => {
@@ -67,9 +66,8 @@ export const AuthProvider = ({children}) => {
             SecureStore.setItemAsync('user', JSON.stringify(userResponse));
           })
           .catch(error => {
-            console.log('Login error:', error);
-            const key = Object.keys(error.response.data.errors)[0];
-            setError(error.response.data.errors[key][0]);
+            console.log('Login error:', error.response.data);
+            setError(error.response.data);
           })
         },     
         logout: () => {
@@ -82,6 +80,31 @@ export const AuthProvider = ({children}) => {
           })
           .catch(error => {
             console.log("Logout error: ", error.response);
+          })
+        },
+        update: (name, username, email)=>{
+          api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+          api.put('api/user/update', {name, username, email})
+          .then(response => {
+            console.log('Data:', response.data.data);
+            data = response.data.data;
+            
+            const userResponse = {
+              id: data.id,
+              name: data.name,
+              username: data.username,
+              token: data.token,
+            }
+            console.log("User response ", userResponse.token);
+            
+            setUser(userResponse);
+            
+            setError(null);
+            SecureStore.setItemAsync('user', JSON.stringify(userResponse));
+          })
+          .catch(error => {
+            console.log('Update error:', error.response.data);
+            setError(error.response.data);
           })
         }
       }}>
