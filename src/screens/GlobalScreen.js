@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FlatList, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import SearchBar from "../components/SearchBar";
 import Album from "../components/Album";
 import Challenge from "../components/Challenge";
@@ -15,9 +15,13 @@ function GlobalScreen({navigation: {navigate}}){
     const [challenges, setChallenges] = useState([])
     const [albums, setAlbums] = useState([])
     const [images, setImages] = useState([])
-
+    const[loading, setLoading]=useState(true)
   const [searchPhrase, setSearchPhrase] = useState("");
   const [clicked, setClicked] = useState(false);
+  const[data, setData] = useState([])
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
     const getChallenges=()=>{
         api.get('/api/challenges')
@@ -38,20 +42,39 @@ function GlobalScreen({navigation: {navigate}}){
     }
 
     const getImages=()=>{
-        api.get('api/images')
+        api.get(`api/images/?page=${currentPage}`)
         .then(response => {
-        setImages(response.data.data);})
+            //console.log("API Response:", response.data); // Log the response for debugging
+            const { data, meta } = response.data;
+            const imagesArray = Object.values(data); // Convert the object into an array of objects
+            setImages((prevImages) => [...prevImages, ...imagesArray]);
+            setTotalPages(meta.last_page);
+            setLoading(false);
+    })
         .catch(error => {
             console.log(error.response);
+            setLoading(false)
         })
     }
+
+    const handleScrollEnd = (event) => {
+          console.log(currentPage)
+          if (currentPage < totalPages) {
+            
+          setCurrentPage((prevPage) => prevPage + 1);
+          console.log(currentPage)
+          setLoading(true);
+          //getImages() 
+        }
+      };
+
     useEffect(()=>{
         getAlbums();
         getChallenges();
         getImages();
     
 
-    },[])
+    },[currentPage])
     return(
         <SafeAreaView style = {styles.container}>
             <SearchBar
@@ -61,14 +84,17 @@ function GlobalScreen({navigation: {navigate}}){
                 setClicked={setClicked}
             />
             {clicked ? (
+                
                 <List
                     searchPhrase={searchPhrase}
-                    data={albums}
+                    data={data}
+                    setData={setData}
                     setClicked={setClicked}
                 />
 
             ):(
             <View style={{flex: 1, justifyContent: 'center'}}>
+                <ScrollView onScrollEndDrag={handleScrollEnd} scrollEventThrottle={16}>
                 <NormalText text="Albums"/>
                 <View style = {styles.albums}>
                     <FlatList
@@ -108,6 +134,8 @@ function GlobalScreen({navigation: {navigate}}){
                 keyExtractor = {( item, index) => item.id }
                 ></FlatList>
             </View>
+            {loading && <ActivityIndicator/>}
+            </ScrollView>
           </View>
           )}
           

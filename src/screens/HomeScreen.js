@@ -13,42 +13,52 @@ export default function HomeScreen({navigation}){
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+   const fetchImages = async () => {
+        
+        api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+        await api.get(`api/user/users/following/images/?page=${currentPage}`).then(response => {
+          const { data, meta } = response.data;
+          const imagesArray = Object.values(data); 
+          setImages((prevImages) => [...prevImages, ...imagesArray]);
+          setTotalPages(meta.last_page);
+          setLoading(false);
+        }).catch(error => {
+          console.log("Error", error);
+          setLoading(false);
+      });
+    }
   useEffect(() => {
-    api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-    api.get(`api/user/users/following/images/?page=${currentPage}`).then(response => {
-      console.log("Imagessss", response.data)
-      const { data, meta } = response.data;
-      setImages((prevImage) => [...prevImage, ...data]);
-      setTotalPages(meta.total_pages);
+    fetchImages()
 
-      setLoading(false);
-    }).catch(error => {
-      console.log("Error", error);
-      setLoading(false);
-    });
   }, [currentPage]);
 
   const handleLoadMore = () => {
+    setLoading(true)
     if (currentPage < totalPages) {
+      console.log(currentPage)
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
     return(
-    <SafeAreaView>
-        {loading ? ( <ActivityIndicator/>):
-        ( <FlatList
-            data={images}
-            renderItem={({item}) => {
-              return(<Post post={item}/>)
-          }}
+    <SafeAreaView style={styles.container}>
+      {images.length > 0 ? (
+        <FlatList
+          data={images}
+          renderItem={({ item }) => <Post post={item} />}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
-          ></FlatList> )}
+          keyExtractor={(item) => item.id.toString()}
+        />
+      ) : (
+        <ActivityIndicator />
+      )}
+      {loading && <ActivityIndicator/>}
     </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   container:{
-    paddingVertical:20,
+    flex:1,
+    justifyContent: 'center'
   }
 });
