@@ -38,7 +38,7 @@ class CommentsController extends Controller
         if ($validator->fails()) {
             return response()->json(['isSuccess' => false, 'message' => $validator->messages()]);
         }
-        $comment = new Comment([
+        $comment = Comment::create([
             'content' => $request->content,
         ]);
         if ($request->parent_id) {
@@ -59,8 +59,8 @@ class CommentsController extends Controller
      */
     public function show(string $id)
     {
-        $comments = Comment::with('parent', 'comments')->findOrFail($id);
-        return new CommentResource($comments);
+        $comment = Comment::with('comments')->findOrFail($id);
+        return new CommentResource($comment);
     }
 
     /**
@@ -68,9 +68,14 @@ class CommentsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $comment = Comment::find($id);
-        $user = User::findOrFail(Auth::id());
-        $comment->users_liked()->save($user);
+        $comment = Comment::with('comments')->findOrFail($id);
+        if ($request->user_liked) {
+            $comment->users_liked()->sync(Auth::id());
+        } else if ($request->user_unliked) {
+            $comment->users_liked()->detach(Auth::id());
+        }
+        $comment->update();
+        return new CommentResource($comment);
     }
 
     /**

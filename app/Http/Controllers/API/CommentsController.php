@@ -26,7 +26,7 @@ class CommentsController extends Controller
     public function getbyImageId(string $id)
     {
         $image = Image::find($id);
-        $comments = $image->comments()->with('parent', 'comments')->get();
+        $comments = $image->comments()->with('comments')->where('parent_id', null)->get();
         return CommentResource::collection($comments);
     }
     /**

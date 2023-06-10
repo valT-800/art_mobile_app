@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ImageCollectionResource;
+use App\Http\Resources\ImageResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UsersController extends Controller
 {
@@ -20,7 +23,6 @@ class UsersController extends Controller
 
         return UserResource::collection($users);
     }
-
     /**
      * Store a newly created resource in storage.
      *

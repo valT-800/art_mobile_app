@@ -59,11 +59,12 @@ class ChallengesController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $challenge = Challenge::findOrFail($id);
-        $challenge->update($request->all());
+        $challenge = Challenge::with('images')->findOrFail($id);
+        if ($request->image_id) {
+            $challenge->images()->sync($request->image_id);
+        }
         return new ChallengeResource($challenge);
     }
-
     /**
      * Remove the specified resource from storage.
      */

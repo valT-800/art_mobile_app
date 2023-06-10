@@ -26,6 +26,7 @@ class UserResource extends JsonResource
             'avatar' => $this->avatar,
             'cover' => $this->cover,
             'points' => $this->points,
+            'profile_photo_url' => $this->profile_photo_url,
             'followers' => $this->followers->map(function ($item) {
                 return ['id' => $item->id, 'username' => $item->username];
             }),
@@ -35,13 +36,13 @@ class UserResource extends JsonResource
             'albums' => $this->albums->map(function ($item) {
                 return ['id' => $item->id, 'title' => $item->title];
             }),
-            'images' => $this->albums->map(function ($item) {
+            'images' => $this->images->map(function ($item) {
                 return ['id' => $item->id, 'url' => $item->url];
             }),
             'liked_images' => $this->liked_images->map(function ($item) {
                 return ['id' => $item->id, 'url' => $item->url];
             }),
-            //'liked_comments' => $this->liked_comments,
+            'liked_comments' => $this->liked_comments,
             'saved_images' => $this->saved_images->map(function ($item) {
                 return ['id' => $item->id, 'url' => $item->url];
             }),

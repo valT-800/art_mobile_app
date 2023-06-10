@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AlbumResource;
 use App\Models\Album;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AlbumsController extends Controller
@@ -20,6 +21,12 @@ class AlbumsController extends Controller
     public function index()
     {
         $albums = Album::with('images')->get();
+        return AlbumResource::collection($albums);
+    }
+    public function getbyUserId(string $id)
+    {
+        $user = User::findOrFail($id);
+        $albums = $user->albums()->with('images')->get();
         return AlbumResource::collection($albums);
     }
 

@@ -50,7 +50,9 @@ class AlbumsController extends BaseController
     public function update(Request $request, string $id)
     {
         $album = Album::findOrFail($id);
-        $album->update($request->all());
+        $album->title = $request->title;
+        $album->description = $request->description;
+        $album->update();
         return new AlbumResource($album);
     }
 
