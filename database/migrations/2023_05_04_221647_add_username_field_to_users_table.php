@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('username')->unique()->default(Str::random(10));
+            $table->string('username')->unique()->nullable();
         });
     }
 

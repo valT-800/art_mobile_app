@@ -24,6 +24,6 @@ class Challenge extends Model
 
     public function images()
     {
-        return $this->belongsToMany(Challenge::class, 'challenges_images', 'challenge_id', 'image_id');
+        return $this->belongsToMany(Image::class, 'challenges_images', 'challenge_id', 'image_id');
     }
 }
