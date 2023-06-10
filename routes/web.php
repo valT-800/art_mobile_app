@@ -18,7 +18,7 @@ Route::view('/home', 'pages.home');       //naršyklės lange įvedus svetainės
 
 Route::view('/admin', 'admin.dashboard'); //naršyklės lange įvedus svetainės adresą + '/admin' bus matomas vaizdas dashboard
 Route::view('/user', 'user.dashboard');
-
+Route::get('/images/following-users-images', [App\Http\Controllers\API\ImagesController::class, 'getFollowingUsersImages']);
 Route::get('/admin/roles', [App\Http\Controllers\Admin\RolesController::class, 'index']);
 Route::get('/admin/roles/create', [App\Http\Controllers\Admin\RolesController::class, 'create']);
 Route::post('/admin/roles', [App\Http\Controllers\Admin\RolesController::class, 'store']);
