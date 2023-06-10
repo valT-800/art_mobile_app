@@ -13,6 +13,7 @@ export default function PostScreen({navigation, route}){
   useEffect(() => {
     api.get(`api/images/${id}`).then(response => {
       setImage(response.data.data);
+      console.log(image)
       setLoading(false)
     }).catch(error => {
       setLoading(false)

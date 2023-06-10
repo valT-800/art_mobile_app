@@ -3,6 +3,7 @@ import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from
 import { Image } from 'expo-image';
 import { api, baseURL } from '../../services/api_base';
 import NormalText from '../../components/NormalText';
+import addImageToChallenges from '../../utils/addImageToChallenges';
 
 
 function PickImageFromApp({navigation:{navigate}, route}){
@@ -17,15 +18,7 @@ function PickImageFromApp({navigation:{navigate}, route}){
         }
       };
 
-      const addImageToChallenges =(image_id, challenge_id)=>{
-        api.put(`api/user/images/${image_id}`, {challenge_id: challenge_id.id}).then(response => {       
-            
-            navigate('Challenge', challenge_id)
-          }).catch(error => {
-            
-            console.log("Error", error.response);
-          });
-    }
+      
       useEffect(() => {
         
         api.get('api/user/images')
@@ -54,7 +47,9 @@ function PickImageFromApp({navigation:{navigate}, route}){
                     margin: 1
                 }}>
                 <TouchableOpacity
-                onPress={()=> addImageToChallenges(item.id, {id})}>
+                onPress={async()=> {
+                  addImageToChallenges(item.id, {id})
+                  navigate('Challenge', {id})}}>
                     <Image style={styles.image}
                         source={baseURL + item.url }></Image>
                     </TouchableOpacity>

@@ -1,10 +1,8 @@
-import { useNavigation } from "@react-navigation/native";
-import { createContext, useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { AuthContext } from "../../AuthProvider";
-import {api} from "../../services/api_base";
+import {useState } from "react";
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import CustomInput from "../../components/CustomInput";
 import NormalText from "../../components/NormalText";
+import editAlbum from "../../utils/editAlbum";
 
 export default function EditAlbumScreen({route, navigation:{navigate, setOptions}}){
 
@@ -15,21 +13,11 @@ export default function EditAlbumScreen({route, navigation:{navigate, setOptions
     setOptions({
         headerRight: () =>
           <CustomIcon name='checkmark' size={30}
-            event={() => editAlbum()}
+            event={async() => {
+              await editAlbum(id, newTitle, newDescription)
+            navigate('Album', id)}}
             />
         });
-
-    
-
-    const editAlbum=()=>{
-      api.put(`/api/user/albums/${id}`, {title: newTitle, description: newDescription}).then(response => {
-        
-        navigate('Album', {id})
-      }).catch(error => {
-        
-        console.log("Error", error.response);
-      });
-    }
   
     return(
         <SafeAreaView style= {styles.container}>

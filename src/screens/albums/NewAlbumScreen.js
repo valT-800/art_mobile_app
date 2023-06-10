@@ -3,6 +3,7 @@ import {api} from "../../services/api_base";
 import { useState } from "react";
 import NormalText from "../../components/NormalText";
 import CustomInput from "../../components/CustomInput";
+import newAlbum from "../../utils/newAlbum";
 
 function NewAlbumScreen({navigation: {navigate, setOptions}}) {
 
@@ -12,22 +13,13 @@ function NewAlbumScreen({navigation: {navigate, setOptions}}) {
     setOptions({
       headerRight: () =>
         <CustomIcon name='checkmark' size={30}
-          event={() => {
-              setData()
-            
+          event={async() => {
+              await newAlbum(title, description)
+              navigate('Profile')
             }}
           />
       });
 
-    const setData = () => {
-        api.post('api/user/albums', {
-            title: title,
-            description: description
-        })
-        .then(() => {
-            navigate('Profile');
-        }).catch((err) => console.log(err))
-    }
     return(
         <SafeAreaView style={styles.container}>
             <View style={{padding: 10, alignItems: 'center'}}>

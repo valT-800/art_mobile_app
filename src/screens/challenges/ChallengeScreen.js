@@ -1,39 +1,26 @@
-import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { AuthContext } from "../../AuthProvider";
 import React, { useContext, useEffect, useState } from 'react';
-import { api } from "../../services/api_base";
 import BoldText from "../../components/BoldText";
 import NormalText from "../../components/NormalText";
-import CustomIcon from "../../components/CustomIcon";
 import CustomButton from "../../components/CustomButton";
 import ImageComponent from "../../components/Image";
+import getChallenge from "../../utils/getChallenge";
 
 export default function ChallengeScreen({route, navigation:{navigate}}){
-  const{user} = useContext(AuthContext)
+
   const[challenge,setChallenge]=useState({});
   const [loading, setLoading] = useState(true);
 
   const{id} = route.params;
 
-  const addPhoto= ()=>{
-    navigate('AddToChallenge', {id});
-  }
   useEffect(() => {
-    //api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-    api.get(`api/challenges/${id}`).then(response => {
-      let apidata = response.data;
-      console.log(apidata);
-      if (apidata.length !== 0) {
-        setChallenge(apidata.data);
-      }
-      setLoading(false);
-      
-    }).catch(error => {
-      console.log(error);
-      setLoading(false);
-    });
-  }, [loading]);
+    async function fetchData(){
+      let result = await getChallenge(id)
+      setChallenge(result)
+      setLoading(false)
+    }
+    fetchData()
+  }, []);
   
   if(loading){
     return(
@@ -48,8 +35,9 @@ export default function ChallengeScreen({route, navigation:{navigate}}){
           <View style = {{padding: 10, alignItems: 'center'}}>
             <BoldText text={challenge.title}/>
             <NormalText text={challenge.description}/>
+            <CustomButton title="Participate" onPress={()=>navigate('AddToChallenge', {id})} />
           </View>
-          <CustomButton title="Participate" onPress={()=>addPhoto()} />
+          
           <View style={styles.images}>
             {challenge.images &&
             <FlatList

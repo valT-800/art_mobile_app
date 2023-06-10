@@ -1,12 +1,12 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+
 import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import CustomIcon from "../../components/CustomIcon";
 import { useContext, useEffect, useState } from "react";
-import {api} from "../../services/api_base";
 import { AuthContext } from "../../AuthProvider";
 import Comment from "../../components/Comment";
 import Divider from "../../components/Divider";
+import getImageComments from "../../utils/getImageComments";
+import newComment from "../../utils/newComment";
 
 export default function CommentsScreen({route, navigation:{navigate}}){
 
@@ -15,63 +15,33 @@ export default function CommentsScreen({route, navigation:{navigate}}){
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const[content, setContent] = useState('');
+  const[parent, setParent]= useState(null);
   const {image_id} = route.params;
 
-  const getComments=()=>{
-    console.log('Image id', image_id);
-    api.get(`/api/comments/image/${image_id}`).then(response => {
-      let apidata = response.data;
-      console.log(apidata);
-      if (apidata.length !== 0) {
-        setComments(apidata.data);        
-      }
-      setLoading(false);
-      setContent('');
-    }).catch(error => {
-      console.log(error);
-      setLoading(false);
-    });
-  }
-  const postComment =()=>{
+  
+  const postComment =async()=>{
     setLoading(true);
     if(content.trim() != ''){
       console.log('Comment', content)
-      api.post('/api/user/comments', {
-        content: content,
-        image_id: image_id,
-      }).then(res => {
-        getComments();
-      }).catch(error => {
-        console.log(error);
-      });
+      await newComment(content, image_id, parent)
+      setContent('')
+      setLoading(false)
+      
   }
 }
-  function isLiked(comment, user_id){
-      
-    return comment.users_liked && comment.users_liked.some((user) => user.id === user_id);
-      
-  }
 
   useEffect(() => {
-    console.log('Image id', image_id);
-    api.get(`/api/comments/image/${image_id}`).then(response => {
-      let apidata = response.data;
-      console.log(apidata);
-      if (apidata.length !== 0) {
-        setComments(apidata.data);        
-      }
-      setContent('');
-      setLoading(false);
+    async function fetchData(){
+      let result = await getImageComments(image_id)
+      setComments(result)
+      setLoading(false)
       
-    }).catch(error => {
-      console.log(error);
-      setLoading(false);
-    });
-    
+    }
+    fetchData()
   }, [loading]);
   return(
     <SafeAreaView style = {{flex: 1}}>
-      {!loading &&
+      {loading ? <ActivityIndicator/> : 
       <View style={styles.list}>
       <FlatList 
       
@@ -80,7 +50,7 @@ export default function CommentsScreen({route, navigation:{navigate}}){
         renderItem={({item}) => {
           return(
             <View >
-              <Comment item={item} liked= {isLiked(item, user.id)} ></Comment>
+              <Comment item={item} setParent={setParent} setContent={setContent}></Comment>
               <Divider></Divider>
           </View>
           )}}
@@ -93,6 +63,7 @@ export default function CommentsScreen({route, navigation:{navigate}}){
       <TextInput
           multiline
           placeholder="Add a comment..."
+          value={content}
           onChangeText={(text) => {
             setContent(text);
         }}/>

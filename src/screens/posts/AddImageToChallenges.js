@@ -1,54 +1,36 @@
 import React, { useState } from 'react';
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import BoldText from '../../components/BoldText';
 import CustomButton from '../../components/CustomButton';
-import { api } from '../../services/api_base';
+import pickImageFromGallery from '../../utils/pickImageFromGallery';
+import takePhoto from '../../utils/takePhoto';
 
-const options = {
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-};
-
-export default function AddImageToChallenges ({navigation: {navigate, goback}, route}) {
+export default function SelectImageScreen ({navigation: {navigate}, route}) {
     const{id} = route.params;
     const [image, setImage] = useState(null);
     
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync(options);
-
-    console.log(result);
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      image ? navigate('NewPost', { image, challenge_id: id }) : pickImage
-    }
-    else{
-      pickImage
-    }
+    let result = await pickImageFromGallery()
+    setImage(result);
+    image ? navigate('NewPost', { image, challenge_id: id }) : pickImage
+    
   };
 
-  const takePhoto = async () => {
-      let result = await ImagePicker.launchCameraAsync(options);
-      console.log(result);
-      if (!result.canceled) {
-        setImage(result.assets[0].uri);
-        image ? navigate('NewPost', { image }) : takePhoto
-      }
-      
-  };
+  const openCamera = async () => {
+      let result = await takePhoto()
+        setImage(result);
+        image ? navigate('NewPost', { image, challenge_id: id }) : openCamera
+  }
 
   
 
     return (
       <View style={styles.container}>
-        <CustomButton title = 'Select from existing' onPress={navigate('PickImageFromApp', {id})}></CustomButton>
+        {id && <CustomButton title = 'Select from existing' onPress={()=>navigate('PickImageFromApp', {id})}></CustomButton>}
         <CustomButton title='Select from gallery' onPress={pickImage}>
         </CustomButton>
-        <CustomButton title = 'Take photo' onPress={takePhoto}>
+        <CustomButton title = 'Take photo' onPress={openCamera}>
         </CustomButton>
       </View>
     );

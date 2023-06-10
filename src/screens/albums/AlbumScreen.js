@@ -6,7 +6,7 @@ import {api} from "../../services/api_base";
 import ImageComponent from "../../components/Image";
 import BoldText from "../../components/BoldText";
 import NormalText from "../../components/NormalText";
-import CustomButton from "../../components/CustomButton";
+import getAlbum from "../../utils/getAlbum";
 
 export default function AlbumScreen({route, navigation:{navigate}}){
   const{user} = createContext(AuthContext)
@@ -14,21 +14,15 @@ export default function AlbumScreen({route, navigation:{navigate}}){
   const [loading, setLoading] = useState(true);
 
   const{id} = route.params;
-
+  
   useEffect(() => {
-    api.get('/api/albums/'+id).then(response => {
-      let apidata = response.data;
-      console.log(apidata);
-      if (apidata.length !== 0) {
-        setAlbum(apidata.data);
-      } 
-        setLoading(false);
-      
-    }).catch(error => {
-      console.log(error);
-      setLoading(false);
-    });
-  }, [loading]);
+    async function fetchData(){
+      let result = await getAlbum(id)
+      setAlbum(result)
+      setLoading(false)
+    }
+    fetchData()
+  }, []);
   
   if(loading){
     return(
