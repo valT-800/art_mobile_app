@@ -27,8 +27,10 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "INTERNET"
-      ]
+        "android.permission.INTERNET",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.val.ol.art_mobile_app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -42,6 +44,11 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a51fce83-9ff5-4fdf-a74b-35ae0df68ec2"
+      }
+    }
   }
 }
