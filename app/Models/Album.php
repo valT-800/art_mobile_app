@@ -26,8 +26,8 @@ class Album extends Model
     {
         return $this->belongsTo(User::class)->withDefault();
     }
-    public function images()
+    public function posts()
     {
-        return $this->hasMany(Image::class);
+        return $this->hasMany(Post::class);
     }
 }

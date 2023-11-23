@@ -67,13 +67,13 @@ class User extends Authenticatable
         return $this->belongsToMany(Comment::class, 'comments_likes', 'user_id', 'comment_id');
     }
 
-    public function liked_images()
+    public function liked_posts()
     {
-        return $this->belongsToMany(Image::class, 'images_likes', 'user_id', 'image_id');
+        return $this->belongsToMany(Post::class, 'posts_likes', 'user_id', 'post_id');
     }
-    public function saved_images()
+    public function saved_posts()
     {
-        return $this->belongsToMany(Image::class, 'images_saved', 'user_id', 'image_id');
+        return $this->belongsToMany(Post::class, 'posts_saved', 'user_id', 'post_id');
     }
     public function level()
     {
@@ -95,9 +95,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Album::class);
     }
-    public function images()
+    public function posts()
     {
-        return $this->hasMany(Image::class);
+        return $this->hasMany(Post::class);
     }
     public function comments()
     {

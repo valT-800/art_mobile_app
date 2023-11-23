@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API\user;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ImageCollectionResource;
+use App\Http\Resources\PostCollectionResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -25,35 +25,36 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = User::with('albums', 'images', 'liked_images', 'saved_images', 'following', 'followers')->get();
+        $users = User::with('albums', 'posts', 'liked_posts', 'saved_posts', 'following', 'followers')->get();
 
         return UserResource::collection($users);
     }
-    public function getFollowingUsersImages(Request $request)
+    public function getFollowingUsersPosts(Request $request)
     {
         $user = User::findOrFail(Auth::id());
-        $followingUsers = $user->following()->with('albums', 'images', 'liked_images', 'saved_images', 'followers', 'following')->get();
-        $followingUsers = $user->following()->with(['images.user', 'images.comments', 'images.users_liked', 'images.users_saved', 'images.tags', 'images.challenges'])->get();
-        $images = $followingUsers->pluck('images')->flatten();
+        $followingUsers = $user->following()->with('albums', 'posts', 'liked_posts', 'saved_posts', 'followers', 'following')->get();
+        $followingUsers = $user->following()->with(['posts.user', 'posts.comments', 'posts.users_liked', 'posts.users_saved', 'posts.tags', 'posts.competitions'])->get();
+        $posts = $followingUsers->pluck('posts')->flatten();
 
-        $user = $images->pluck('user')->flatten();
-        $comments = $images->pluck('comments')->flatten();
-        $users_saved = $images->pluck('users_saved')->flatten();
-        $users_liked = $images->pluck('users_liked')->flatten();
-        $challenges = $images->pluck('challenges')->flatten();
+        $user = $posts->pluck('user')->flatten();
+        $comments = $posts->pluck('comments')->flatten();
+        $users_saved = $posts->pluck('users_saved')->flatten();
+        $users_liked = $posts->pluck('users_liked')->flatten();
+        $competitions = $posts->pluck('competitions')->flatten();
 
-        $tags = $images->pluck('tags')->flatten();
+        $tags = $posts->pluck('tags')->flatten();
         $perPage = $request->input('per_page', 4); // Number of items per page, defaulting to 4
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $slicedImages = $images->slice(($currentPage - 1) * $perPage, $perPage);
+        $slicedPosts = $posts->slice(($currentPage - 1) * $perPage, $perPage);
 
-        $paginatedImages = new LengthAwarePaginator(
-            $slicedImages,
-            $images->count(),
+        $paginatedPosts = new LengthAwarePaginator(
+            $slicedPosts,
+            $posts->count(),
             $perPage,
             $currentPage
         );
-        return new ImageCollectionResource($paginatedImages, $user, $users_liked, $users_saved, $comments, $tags, $challenges);
+        //return new PostCollectionResource($paginatedPosts, $user, $users_liked, $users_saved, $comments, $tags, $competitions);
+        return new PostCollectionResource($paginatedPosts);
     }
 
     /**
@@ -101,7 +102,7 @@ class UsersController extends Controller
     }
     protected function updateVerifiedUser(Request $request): void
     {
-        $user = User::with('albums', 'images', 'liked_images', 'saved_images', 'following', 'followers')->findOrFail(Auth::id());
+        $user = User::with('albums', 'posts', 'liked_posts', 'saved_posts', 'following', 'followers')->findOrFail(Auth::id());
         $user->forceFill([
             'name' => $request->name,
             'email' => $request->email,
@@ -115,7 +116,7 @@ class UsersController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::with('albums', 'images', 'liked_images', 'saved_images', 'following', 'followers')->findOrFail($id);
+        $user = User::with('albums', 'posts', 'liked_posts', 'saved_posts', 'following', 'followers')->findOrFail($id);
         return new UserResource($user);
     }
 

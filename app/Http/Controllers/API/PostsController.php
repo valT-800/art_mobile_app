@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ImageCollectionResource;
-use App\Http\Resources\ImageResource;
+use App\Http\Resources\PostCollectionResource;
+use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
-use App\Models\Image;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class ImagesController extends Controller
+class PostsController extends Controller
 {
 
     public function __construct()
@@ -25,13 +25,13 @@ class ImagesController extends Controller
      */
     public function index()
     {
-        $images = Image::with('tags', 'challenges', 'users_liked', 'users_saved')->orderBy('created_at', 'desc')->paginate(9);
-        return new ImageCollectionResource($images);
+        $posts = Post::with('tags', 'competitions', 'users_liked', 'users_saved')->orderBy('created_at', 'desc')->paginate(9);
+        return new PostCollectionResource($posts);
     }
-    public function getImagesWithoutAlbum(string $id)
+    public function getPostsWithoutAlbum(string $id)
     {
-        $images = Image::with('tags', 'challenges', 'users_liked', 'users_saved')->where('user_id', $id)->where('album_id', null)->orderBy('created_at', 'desc')->paginate(9);
-        return new ImageCollectionResource($images);
+        $posts = Post::with('tags', 'competitions', 'users_liked', 'users_saved')->where('user_id', $id)->where('album_id', null)->orderBy('created_at', 'desc')->paginate(9);
+        return new PostCollectionResource($posts);
     }
 
     /**
@@ -47,8 +47,8 @@ class ImagesController extends Controller
      */
     public function show(string $id)
     {
-        $image = Image::with('tags', 'challenges', 'users_liked', 'users_saved')->findOrFail($id);
-        return new ImageResource($image);
+        $post = Post::with('tags', 'competitions', 'users_liked', 'users_saved')->findOrFail($id);
+        return new PostResource($post);
     }
 
     /**

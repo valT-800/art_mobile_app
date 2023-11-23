@@ -14,7 +14,7 @@ class AlbumsController extends Controller
      */
     public function index()
     {
-        $albums = Album::with('images')->get();
+        $albums = Album::with('posts')->get();
         return view('user.albums.index', compact('albums'));
     }
 

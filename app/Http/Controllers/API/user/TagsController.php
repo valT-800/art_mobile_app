@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API\user;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TagResource;
-use App\Models\Image;
+use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -22,7 +22,7 @@ class TagsController extends Controller
      */
     public function index()
     {
-        $tags = Tag::with('images')->get();
+        $tags = Tag::with('posts')->get();
         return TagResource::collection($tags);
     }
 
@@ -33,7 +33,7 @@ class TagsController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'tag' => ['required', 'string', Rule::unique('tags')],
-            'image_id' => 'required|exists:images,id',
+            'post_id' => 'required|exists:posts,id',
 
         ]);
         if ($validator->fails()) {
@@ -43,8 +43,8 @@ class TagsController extends Controller
             'tag' => $request->tag,
         ]);
 
-        $image = Image::findOrFail($request->image_id);
-        $image->tags()->save($tag);
+        $post = Post::findOrFail($request->post_id);
+        $post->tags()->save($tag);
 
         return response()->json(['isSuccess' => true, 'message' => 'Succesfully posted']);
     }
@@ -54,7 +54,7 @@ class TagsController extends Controller
      */
     public function show(string $id)
     {
-        $tags = Tag::with('images')->findOrFail($id);
+        $tags = Tag::with('posts')->findOrFail($id);
         return new TagResource($tags);
     }
 

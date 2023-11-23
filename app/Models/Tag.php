@@ -22,8 +22,8 @@ class Tag extends Model
      */
     protected $fillable = ['tag'];
 
-    public function images()
+    public function posts()
     {
-        return $this->belongsToMany(Image::class, 'images_tags', 'tag_id', 'image_id');
+        return $this->belongsToMany(Post::class, 'posts_tags', 'tag_id', 'post_id');
     }
 }

@@ -18,7 +18,7 @@ Route::view('/home', 'pages.home');       //naršyklės lange įvedus svetainės
 
 Route::view('/admin', 'admin.dashboard'); //naršyklės lange įvedus svetainės adresą + '/admin' bus matomas vaizdas dashboard
 Route::view('/user', 'user.dashboard');
-Route::get('/images/following-users-images', [App\Http\Controllers\API\ImagesController::class, 'getFollowingUsersImages']);
+Route::get('/posts/following-users-posts', [App\Http\Controllers\API\PostsController::class, 'getFollowingUsersPosts']);
 Route::get('/admin/roles', [App\Http\Controllers\Admin\RolesController::class, 'index']);
 Route::get('/admin/roles/create', [App\Http\Controllers\Admin\RolesController::class, 'create']);
 Route::post('/admin/roles', [App\Http\Controllers\Admin\RolesController::class, 'store']);
@@ -43,13 +43,13 @@ Route::get('/user/albums/{id}/edit', [App\Http\Controllers\AlbumsController::cla
 Route::patch('/user/albums/{id}', [App\Http\Controllers\AlbumsController::class, 'update']);
 Route::delete('/user/albums/{id}', [App\Http\Controllers\AlbumsController::class, 'destroy']);
 
-Route::get('/user/images', [App\Http\Controllers\ImagesController::class, 'index']);
-Route::get('/user/images/create', [App\Http\Controllers\ImagesController::class, 'create']);
-Route::post('/user/images', [App\Http\Controllers\ImagesController::class, 'store']);
-Route::get('/user/images/{id}', [App\Http\Controllers\ImagesController::class, 'show']);
-Route::get('/user/images/{id}/edit', [App\Http\Controllers\ImagesController::class, 'edit']);
-Route::patch('/user/images/{id}', [App\Http\Controllers\ImagesController::class, 'update']);
-Route::delete('/user/images/{id}', [App\Http\Controllers\ImagesController::class, 'destroy']);
+Route::get('/user/posts', [App\Http\Controllers\PostsController::class, 'index']);
+Route::get('/user/posts/create', [App\Http\Controllers\PostsController::class, 'create']);
+Route::post('/user/posts', [App\Http\Controllers\PostsController::class, 'store']);
+Route::get('/user/posts/{id}', [App\Http\Controllers\PostsController::class, 'show']);
+Route::get('/user/posts/{id}/edit', [App\Http\Controllers\PostsController::class, 'edit']);
+Route::patch('/user/posts/{id}', [App\Http\Controllers\PostsController::class, 'update']);
+Route::delete('/user/posts/{id}', [App\Http\Controllers\PostsController::class, 'destroy']);
 
 Route::middleware([
     'auth:sanctum',

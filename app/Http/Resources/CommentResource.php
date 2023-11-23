@@ -17,7 +17,7 @@ class CommentResource extends JsonResource
         return [
             'id' => $this->id,
             'views' => $this->views,
-            'image_id' => $this->image_id,
+            'post_id' => $this->post_id,
             'user' => [
                 'username' => $this->user->username,
                 'profile_photo_url' => $this->user->profile_photo_url,

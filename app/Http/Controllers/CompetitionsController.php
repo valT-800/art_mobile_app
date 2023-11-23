@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Challenge;
+use App\Models\Competition;
 use Illuminate\Http\Request;
 
-class ChallengesController extends Controller
+class CompetitionsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $challenges = Challenge::all()->sortBy("title");
-        return view('user.challenges.index', compact('challenges'));
+        $competitions = Competition::all()->sortBy("title");
+        return view('user.competitions.index', compact('competitions'));
     }
 
     /**
@@ -21,7 +21,7 @@ class ChallengesController extends Controller
      */
     public function create()
     {
-        return view('user.challenges.form');
+        return view('user.competitions.form');
     }
 
     /**
@@ -37,8 +37,8 @@ class ChallengesController extends Controller
      */
     public function show(string $id)
     {
-        $challenge = Challenge::findOrFail($id);  // įvykdoma SQL užklausa, kuri išrenka vieną įrašą iš lentelės pagal ID reikšmę
-        return view('user.challenges.show', compact('challenge'));
+        $competition = Competition::findOrFail($id);  // įvykdoma SQL užklausa, kuri išrenka vieną įrašą iš lentelės pagal ID reikšmę
+        return view('user.competitions.show', compact('competition'));
     }
 
     /**
@@ -46,8 +46,8 @@ class ChallengesController extends Controller
      */
     public function edit(string $id)
     {
-        $challenge = Challenge::findOrFail($id);
-        return view('user.challenges.form', compact('challenge'));
+        $competition = Competition::findOrFail($id);
+        return view('user.competitions.form', compact('competition'));
     }
 
     /**
@@ -63,8 +63,8 @@ class ChallengesController extends Controller
      */
     public function destroy(string $id)
     {
-        $challenge = Challenge::findOrFail($id);
-        $challenge->delete();  // įvykdoma SQL užklausa, kuri pašalina duomenis iš DB
-        return redirect('user/challenges')->with('success', 'Challenge deleted successfully.');
+        $competition = Competition::findOrFail($id);
+        $competition->delete();  // įvykdoma SQL užklausa, kuri pašalina duomenis iš DB
+        return redirect('user/competitions')->with('success', 'Competition deleted successfully.');
     }
 }

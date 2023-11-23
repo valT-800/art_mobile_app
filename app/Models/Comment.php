@@ -28,9 +28,9 @@ class Comment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function image()
+    public function post()
     {
-        return $this->belongsTo(Image::class);
+        return $this->belongsTo(Post::class);
     }
     public function parent()
     {

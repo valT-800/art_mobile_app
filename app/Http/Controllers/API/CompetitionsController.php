@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ChallengeResource;
-use App\Models\Challenge;
+use App\Http\Resources\CompetitionResource;
+use App\Models\Competition;
 use Illuminate\Http\Request;
 
-class ChallengesController extends Controller
+class CompetitionsController extends Controller
 {
 
     public function __construct()
@@ -19,8 +19,8 @@ class ChallengesController extends Controller
      */
     public function index()
     {
-        $challenges = Challenge::with('images')->get();
-        return ChallengeResource::collection($challenges);
+        $competitions = Competition::with('posts')->get();
+        return CompetitionResource::collection($competitions);
     }
 
     /**
@@ -36,8 +36,8 @@ class ChallengesController extends Controller
      */
     public function show(string $id)
     {
-        $challenges = Challenge::with('images')->findOrFail($id);
-        return new ChallengeResource($challenges);
+        $competitions = Competition::with('posts')->findOrFail($id);
+        return new CompetitionResource($competitions);
     }
 
     /**

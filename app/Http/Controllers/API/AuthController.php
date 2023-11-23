@@ -42,7 +42,6 @@ class AuthController extends BaseController
             'password' => Hash::make($request->password),
             //'api_token' => Str::random(60),
         ]);
-
         $success['token'] =  $user->createToken('MyApp')->plainTextToken;
         $success['username'] =  $user->username;
         $success['name'] =  $user->name;
@@ -50,6 +49,7 @@ class AuthController extends BaseController
 
 
         return $this->sendResponse($success, 'User register successfully.');
+
     }
 
     /**
@@ -70,6 +70,7 @@ class AuthController extends BaseController
         } else {
             return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
         }
+    
     }
 
     public function update(Request $request)

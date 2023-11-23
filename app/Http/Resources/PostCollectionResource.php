@@ -4,13 +4,13 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class ImageCollectionResource extends ResourceCollection
+class PostCollectionResource extends ResourceCollection
 {
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function ($image) {
-                return new ImageResource($image);
+            'data' => $this->collection->map(function ($post) {
+                return new PostResource($post);
             }),
             'meta' => [
                 'pagination' => [

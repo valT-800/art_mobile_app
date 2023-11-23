@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class ImageResource extends JsonResource
+class PostResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -39,7 +39,7 @@ class ImageResource extends JsonResource
 
             ],
             'comments' => $this->comments,
-            'challenges' => $this->challenges->map(function ($item) {
+            'competitions' => $this->competitions->map(function ($item) {
 
                 return ['id' => $item->id, 'title' => $item->title];
             }),

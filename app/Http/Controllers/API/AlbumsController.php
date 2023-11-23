@@ -20,13 +20,13 @@ class AlbumsController extends Controller
      */
     public function index()
     {
-        $albums = Album::with('images')->get();
+        $albums = Album::with('posts')->get();
         return AlbumResource::collection($albums);
     }
     public function getbyUserId(string $id)
     {
         $user = User::findOrFail($id);
-        $albums = $user->albums()->with('images')->get();
+        $albums = $user->albums()->with('posts')->get();
         return AlbumResource::collection($albums);
     }
 
@@ -43,7 +43,7 @@ class AlbumsController extends Controller
      */
     public function show(string $id)
     {
-        $albums = Album::with('images')->findOrFail($id);
+        $albums = Album::with('posts')->findOrFail($id);
         return new AlbumResource($albums);
     }
 

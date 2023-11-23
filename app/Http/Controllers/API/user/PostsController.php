@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\API\user;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ImageCollectionResource;
-use App\Http\Resources\ImageResource;
+use App\Http\Resources\PostCollectionResource;
+use App\Http\Resources\PostResource;
 use App\Models\Album;
-use App\Models\Challenge;
-use App\Models\Image;
+use App\Models\Competition;
+use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use PhpParser\Node\Expr\FuncCall;
 
-class ImagesController extends Controller
+class PostsController extends Controller
 {
 
     public function __construct()
@@ -30,19 +30,19 @@ class ImagesController extends Controller
      */
     public function index()
     {
-        $images = Image::with('tags', 'challenges', 'users_liked', 'users_saved')->where('user_id', Auth::id())->orderBy('created_at', 'desc')->paginate(20);
-        return new ImageCollectionResource($images);
+        $posts = Post::with('tags', 'competitions', 'users_liked', 'users_saved')->where('user_id', Auth::id())->orderBy('created_at', 'desc')->paginate(20);
+        return new PostCollectionResource($posts);
     }
 
-    public function getLikedImages()
+    public function getLikedPosts()
     {
-        $liked_images = User::find(Auth::id())->liked_images()->with('tags', 'challenges', 'users_liked', 'users_saved')->orderBy('created_at', 'desc')->paginate(20);
-        return new ImageCollectionResource($liked_images);
+        $liked_posts = User::find(Auth::id())->liked_posts()->with('tags', 'competitions', 'users_liked', 'users_saved')->orderBy('created_at', 'desc')->paginate(20);
+        return new PostCollectionResource($liked_posts);
     }
-    public function getSavedImages()
+    public function getSavedPosts()
     {
-        $liked_images = User::find(Auth::id())->liked_images()->with('tags', 'challenges', 'users_liked', 'users_saved')->orderBy('created_at', 'desc')->paginate(20);
-        return new ImageCollectionResource($liked_images);
+        $saved_posts = User::find(Auth::id())->saved_posts()->with('tags', 'competitions', 'users_liked', 'users_saved')->orderBy('created_at', 'desc')->paginate(20);
+        return new PostCollectionResource($saved_posts);
     }
 
     /**
@@ -51,26 +51,26 @@ class ImagesController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), ['image' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048']);
+        $validator = Validator::make($request->all(), ['post' => 'required|post|mimes:jpg,png,jpeg,gif,svg|max:2048']);
         if ($validator->fails()) {
             return response()->json(['isSuccess' => false, 'message' => $validator->messages()], 400);
         }
-        $file = $request->file('image');
-        $extension = $request->image->getClientOriginalExtension();
+        $file = $request->file('post');
+        $extension = $request->post->getClientOriginalExtension();
         $fileName = $file . '.' . uniqid() . '.' . $extension;
-        $path = $file->move('images', $fileName);
-        $image = Image::create([
+        $path = $file->move('posts', $fileName);
+        $post = Post::create([
             'description' => $request->description,
             'url' => $path,
         ]);
         $user = User::find(Auth::id());
-        $image->user()->associate($user);
+        $post->user()->associate($user);
         if ($request->album_id) {
             $album = Album::findOrFail($request->album_id);
-            $image->album()->associate($album);
+            $post->album()->associate($album);
         }
-        if ($request->challenge_id) {
-            $image->challenges()->sync($request->challenge_id);
+        if ($request->competition_id) {
+            $post->competitions()->sync($request->competition_id);
         }
 
 
@@ -91,10 +91,10 @@ class ImagesController extends Controller
                 }
                 $tagIds[] = $tag->id;
             }
-            $image->tags()->sync($tagIds);
+            $post->tags()->sync($tagIds);
         }
-        $image->save();
-        return response()->json(['success' => true, 'data' => $image->id], 200);
+        $post->save();
+        return response()->json(['success' => true, 'data' => $post->id], 200);
     }
 
     /**
@@ -102,8 +102,8 @@ class ImagesController extends Controller
      */
     public function show(string $id)
     {
-        $image = Image::with('tags', 'challenges', 'users_liked', 'users_saved')->findOrFail($id);
-        return new ImageResource($image);
+        $post = Post::with('tags', 'competitions', 'users_liked', 'users_saved')->findOrFail($id);
+        return new PostResource($post);
     }
 
     /**
@@ -111,33 +111,32 @@ class ImagesController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $image = Image::with('tags', 'challenges', 'users_liked', 'users_saved')->findOrFail($id);
+        $post = Post::with('tags', 'competitions', 'users_liked', 'users_saved')->findOrFail($id);
         if ($request->edited) {
-            $image->description = $request->description;
-            //$image->views = $request->views;
+            $post->description = $request->description;
+            //$post->views = $request->views;
         }
 
-
         if ($request->new_album_id) {
-            if (isset($image->album)) {
-                $image->album()->delete();
+            if (isset($post->album)) {
+                $post->album()->delete();
             }
             $newAlbum = Album::find($request->new_album_id);
-            $newAlbum->images()->save($image);
+            $newAlbum->posts()->save($post);
         }
 
         if ($request->user_liked) {
-            $image->users_liked()->sync(Auth::id());
+            $post->users_liked()->sync(Auth::id());
         } else if ($request->user_unliked) {
-            $image->users_liked()->detach(Auth::id());
+            $post->users_liked()->detach(Auth::id());
         }
         if ($request->user_saved) {
-            $image->users_saved()->sync(Auth::id());
+            $post->users_saved()->sync(Auth::id());
         } else if ($request->user_unsaved) {
-            $image->users_saved()->detach(Auth::id());
+            $post->users_saved()->detach(Auth::id());
         }
-        if (isset($request->challenge_id)) {
-            $image->challenges()->sync($request->challenge_id);
+        if (isset($request->competition_id)) {
+            $post->competitions()->sync($request->competition_id);
         }
 
         if ($request->tags && is_array($request->tags)) {
@@ -155,10 +154,10 @@ class ImagesController extends Controller
                 }
                 $tagIds[] = $tag->id;
             }
-            $image->tags()->attach($tagIds);
+            $post->tags()->attach($tagIds);
         }
-        $image->update();
-        return new ImageResource($image);
+        //$post->update();
+        return new PostResource($post);
     }
 
     /**
@@ -166,16 +165,16 @@ class ImagesController extends Controller
      */
     public function destroy(string $id)
     {
-        $image = Image::findOrFail($id);
+        $post = Post::findOrFail($id);
 
-        // Delete the image file from local storage
-        if (file_exists($image->url)) {
-            unlink($image->url);
+        // Delete the post file from local storage
+        if (file_exists($post->url)) {
+            unlink($post->url);
         }
 
-        // Delete the image record from the database
-        $image->delete();
+        // Delete the post record from the database
+        $post->delete();
 
-        return response()->json(['message' => 'Image deleted successfully']);
+        return response()->json(['message' => 'Post deleted successfully']);
     }
 }

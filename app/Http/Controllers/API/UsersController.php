@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ImageCollectionResource;
-use App\Http\Resources\ImageResource;
+use App\Http\Resources\PostCollectionResource;
+use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,7 +19,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = User::with('albums', 'images', 'liked_images', 'saved_images', 'followers', 'following')->get();
+        $users = User::with('albums', 'posts', 'liked_posts', 'saved_posts', 'followers', 'following')->get();
 
         return UserResource::collection($users);
     }
@@ -42,7 +42,7 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        $user = User::with('albums', 'images', 'liked_images', 'saved_images', 'followers', 'following')->findOrFail($id);
+        $user = User::with('albums', 'posts', 'liked_posts', 'saved_posts', 'followers', 'following')->findOrFail($id);
         return new UserResource($user);
     }
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API\user;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
-use App\Models\Image;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +33,7 @@ class CommentsController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'content' => 'required|string',
-            'image_id' => 'required|exists:images,id',
+            'post_id' => 'required|exists:posts,id',
         ]);
         if ($validator->fails()) {
             return response()->json(['isSuccess' => false, 'message' => $validator->messages()]);
@@ -45,8 +45,8 @@ class CommentsController extends Controller
             $parent = Comment::findOrFail($request->parent_id);
             $parent->comments()->save($comment);
         }
-        $image = Image::findOrFail($request->image_id);
-        $image->comments()->save($comment);
+        $post = Post::findOrFail($request->post_id);
+        $post->comments()->save($comment);
 
         $user = User::findOrFail(Auth::id());
         $user->comments()->save($comment);

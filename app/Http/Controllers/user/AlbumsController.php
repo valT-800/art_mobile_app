@@ -16,7 +16,7 @@ class AlbumsController extends Controller
     public function index()
     {
         $user = User::find(Auth::id());
-        $albums = $user->albums()->with('user', 'images')->get();
+        $albums = $user->albums()->with('user', 'posts')->get();
         return view('user.albums.index', compact('albums'));
     }
 

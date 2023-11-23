@@ -20,7 +20,7 @@ class Level extends Model
      *
      * @var array
      */
-    protected $fillable = ['title'];
+    protected $fillable = ['title', 'minimal_points'];
 
     public function users()
     {

@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ChallengeResource extends JsonResource
+class CompetitionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,7 +20,7 @@ class ChallengeResource extends JsonResource
             'description' => $this->description,
             'start_time' => $this->start_time,
             'end_time' => $this->end_time,
-            'images' => $this->images->map(function ($item) {
+            'posts' => $this->posts->map(function ($item) {
                 return ['id' => $item->id, 'url' => $item->url];
             }),
             $this->merge(['language' => $this->language])

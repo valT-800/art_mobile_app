@@ -20,7 +20,7 @@ class AlbumResource extends JsonResource
             'description' => $this->description,
             'username' => $this->user->username,
             'user_id' => $this->user->id,
-            'images' => $this->images->map(function ($item) {
+            'posts' => $this->posts->map(function ($item) {
                 return [
                     'id' => $item->id,
                     'url' => $item->url,

@@ -22,7 +22,7 @@ class AlbumsController extends BaseController
      */
     public function index()
     {
-        $albums = Album::with('images')->where('user_id', Auth::id())->get();
+        $albums = Album::with('posts')->where('user_id', Auth::id())->get();
         return AlbumResource::collection($albums);
     }
 
@@ -40,7 +40,7 @@ class AlbumsController extends BaseController
      */
     public function show(string $id)
     {
-        $album = Album::with('images')->findOrFail($id);
+        $album = Album::with('posts')->findOrFail($id);
         return new AlbumResource($album);
     }
 

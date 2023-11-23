@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\API\user;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ChallengeResource;
-use App\Models\Challenge;
+use App\Http\Resources\CompetitionResource;
+use App\Models\Competition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class ChallengesController extends Controller
+class CompetitionsController extends Controller
 {
 
     public function __construct()
@@ -20,8 +20,8 @@ class ChallengesController extends Controller
      */
     public function index()
     {
-        $challenges = Challenge::with('images')->get();
-        return ChallengeResource::collection($challenges);
+        $competitions = Competition::with('posts')->get();
+        return CompetitionResource::collection($competitions);
     }
 
     /**
@@ -36,11 +36,11 @@ class ChallengesController extends Controller
         if ($validator->fails()) {
             return response()->json(['isSuccess' => false, 'message' => $validator->messages()]);
         }
-        $challenge = new Challenge([
+        $competition = new Competition([
             'title' => $request->title,
             'description' => $request->description
         ]);
-        $challenge->save();
+        $competition->save();
 
         return response()->json(['isSuccess' => true, 'message' => 'Succesfully posted']);
     }
@@ -50,8 +50,8 @@ class ChallengesController extends Controller
      */
     public function show(string $id)
     {
-        $challenges = Challenge::with('images')->findOrFail($id);
-        return new ChallengeResource($challenges);
+        $competitions = Competition::with('posts')->findOrFail($id);
+        return new CompetitionResource($competitions);
     }
 
     /**
@@ -59,18 +59,18 @@ class ChallengesController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $challenge = Challenge::with('images')->findOrFail($id);
-        if ($request->image_id) {
-            $challenge->images()->sync($request->image_id);
+        $competition = Competition::with('posts')->findOrFail($id);
+        if ($request->post_id) {
+            $competition->posts()->sync($request->post_id);
         }
-        return new ChallengeResource($challenge);
+        return new CompetitionResource($competition);
     }
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        $challenge = Challenge::findOrFail($id);
-        $challenge->delete();
+        $competition = Competition::findOrFail($id);
+        $competition->delete();
     }
 }
