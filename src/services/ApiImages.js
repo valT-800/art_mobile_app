@@ -1,9 +1,9 @@
 import axios from 'axios';
 import uuid from 'uuid';
 import * as SecureStore from 'expo-secure-store'
-import reduceImageAsync from '../utils/shrinkImageAsync';
+import reducePostAsync from '../utils/shrinkPostAsync';
 
-const apiImages = axios.create({
+const apiPosts = axios.create({
   baseURL: 'http://192.168.1.103:8000',
   withCredentials: true,
   headers: {
@@ -13,11 +13,11 @@ const apiImages = axios.create({
   },
 });
 
-export default apiImages;
+export default apiPosts;
 
-const collectionName = '/api/user/images'
+const collectionName = '/api/user/posts'
 
-class ApiImages{
+class ApiPosts{
   constructor(){
     axios.create({
       baseURL: 'http://192.168.1.103:8000',
@@ -64,9 +64,9 @@ class ApiImages{
 
 ;
 
-  post = async ({ text, image: localUri }) => {
+  post = async ({ text, post: localUri }) => {
     try {
-      const { uri: reducedImage, width, height } = await reduceImageAsync(
+      const { uri: reducedPost, width, height } = await reducePostAsync(
         localUri,
       );
 
@@ -74,9 +74,9 @@ class ApiImages{
         description: text,
         //uid: this.uid,
         //timestamp: this.timestamp,
-        //imageWidth: width,
-        //imageHeight: height,
-        url: reducedImage,
+        //postWidth: width,
+        //postHeight: height,
+        url: reducedPost,
         //user: getUserInfo(),
       });
     }catch ({ message }) {
@@ -93,8 +93,8 @@ class ApiImages{
   }
 }
 
-ApiImages.shared = new ApiImages();
-//export default ApiImages;
+ApiPosts.shared = new ApiPosts();
+//export default ApiPosts;
 
 /*
 const api = axios.create({
@@ -114,10 +114,10 @@ api.interceptors.request.use(
   function (config) {
     // Set the Authorization header with the token
     const user = SecureStore.getItemAsync('user');
-    console.log("User from SecureStore: ", user);
+    //console.log("User from SecureStore: ", user);
     if (user && user.token) {
       config.headers.Authorization = `Bearer ${user.token}`;
-      console.log("User token ", user.token)
+      //console.log("User token ", user.token)
     }
     return config;
   },

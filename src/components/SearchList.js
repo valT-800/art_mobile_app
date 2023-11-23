@@ -7,15 +7,15 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import NormalText from "./NormalText";
-import BoldText from "./BoldText";
+import {NormalText} from "./AppTextComponents";
+import {BoldText} from "./AppTextComponents";
 import { useNavigation } from "@react-navigation/native";
 import getUsers from "../utils/getUsers";
 import getAlbums from "../utils/getAlbums";
-import getChallenges from "../utils/getChallenges";
+import getCompetitions from "../utils/getCompetitions";
 import TouchableSection from "./TouchableSection";
 import User from "./User";
-import Challenge from "./Challenge";
+import Competition from "./Competition";
 
 // definition of the Item, which will be rendered in the FlatList
 const Item = ({item, onPress}) => (
@@ -51,15 +51,15 @@ const List = ({searchPhrase, setClicked, data, setData}) => {
     }
     
   };
-  const renderChallenges = ({ item }) => {
+  const renderCompetitions = ({ item }) => {
     
       // filter of the title
     if (item.title && item.title.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
-      return <Challenge challenge={item} />;
+      return <Competition competition={item} />;
     }
     // filter of the description
     if (item.description && item.description.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
-      return <Challenge challenge={item} />;
+      return <Competition competition={item} />;
     }
     
   };
@@ -80,7 +80,7 @@ const List = ({searchPhrase, setClicked, data, setData}) => {
 
   const renderItem=({item})=>{
     if (pressedSection=='Albums') return renderAlbums({item})
-    if (pressedSection=='Challenges') return renderAlbums({item})
+    if (pressedSection=='Competitions') return renderAlbums({item})
     if (pressedSection=='Users') return renderUsers({item})
   }
   
@@ -113,15 +113,15 @@ const List = ({searchPhrase, setClicked, data, setData}) => {
               setData([])
               setPressedSection('Albums')
               let response = await getAlbums()
-              console.log(response)
+              //console.log(response)
               setData(response)
             }} 
             pressed = {pressedSection}/>
-            <TouchableSection title = 'Challenges'
+            <TouchableSection title = 'Competitions'
             onPress={async() => {
               setData([])
-              setPressedSection('Challenges')
-              let response = await getChallenges()
+              setPressedSection('Competitions')
+              let response = await getCompetitions()
               setData(response)
             }} 
              pressed = {pressedSection}/>

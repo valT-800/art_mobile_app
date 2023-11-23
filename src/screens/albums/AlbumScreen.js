@@ -3,10 +3,11 @@ import { createContext, useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AuthContext } from "../../AuthProvider";
 import {api} from "../../services/api_base";
-import ImageComponent from "../../components/Image";
-import BoldText from "../../components/BoldText";
-import NormalText from "../../components/NormalText";
+import PostComponent from "../../components/Post";
+import {BoldText} from "../../components/AppTextComponents";
+import {NormalText} from "../../components/AppTextComponents";
 import getAlbum from "../../utils/getAlbum";
+import { Header } from "../../components/AppTextComponents";
 
 export default function AlbumScreen({route, navigation:{navigate}}){
   const{user} = createContext(AuthContext)
@@ -38,16 +39,16 @@ export default function AlbumScreen({route, navigation:{navigate}}){
           <CustomIcon name = 'pencil-outline' size={30} event={()=>navigate('EditAlbum', album)}></CustomIcon>
           </View>
           <View style = {{padding: 10, alignItems: 'center'}}>
-            <BoldText text={album.title}/>
+            <Header text={album.title}/>
           <NormalText text={album.description}/>
           </View>
           
-          <View style={styles.images}>
-            {album.images &&
+          <View style={styles.posts}>
+            {album.posts &&
             <FlatList
-              data={album.images}
+              data={album.posts}
               renderItem={({item}) => {
-              return(<ImageComponent image={item}></ImageComponent>)}}
+              return(<PostComponent post={item}></PostComponent>)}}
               numColumns={3}
               keyExtractor = {( item, index) => item.id }
             ></FlatList>
@@ -63,9 +64,11 @@ export default function AlbumScreen({route, navigation:{navigate}}){
 const styles = StyleSheet.create({
   container:{
     justifyContent: 'center',
-    flex: 1
+    flex: 1,
+    paddingTop: 10,
+    marginTop: 30
   },
-  images: {
+  posts: {
     justifyContent: 'center',
     flex: 1
   }

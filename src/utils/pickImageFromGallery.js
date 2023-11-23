@@ -1,24 +1,24 @@
 
-import * as ImagePicker from 'expo-image-picker';
+import * as PostPicker from 'expo-post-picker';
 
 const options = {
-  mediaTypes: ImagePicker.MediaTypeOptions.All,
+  mediaTypes: PostPicker.MediaTypeOptions.All,
   allowsEditing: true,
   aspect: [3, 4],
-  quality: 1,
+  quality: 0.7,
 };
 
-export default async function pickImageFromGallery (){
-    // No permissions request is necessary for launching the image library
-let result = await ImagePicker.launchImageLibraryAsync(options);
+export default async function pickPostFromGallery (){
+    // No permissions request is necessary for launching the post library
+let result = await PostPicker.launchPostLibraryAsync(options);
 
-console.log(result);
+//console.log(result);
 
 if (!result.canceled) {
     return result.assets[0].uri
 }
 else{
-  pickImage
+  pickPost
 }
 
 };

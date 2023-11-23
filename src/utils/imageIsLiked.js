@@ -1,5 +1,5 @@
-export default function imageIsLiked (image, user_id) {
+export default function postIsLiked (post, user_id) {
 
-    return image.users_liked && image.users_liked.some((user) => user.id === user_id);
+    return post.users_liked && post.users_liked.some((user) => user.id === user_id);
     
   };

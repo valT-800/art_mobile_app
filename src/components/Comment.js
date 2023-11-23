@@ -4,8 +4,8 @@ import CustomIcon from "./CustomIcon";
 import User from "./User";
 import Divider from "./Divider";
 import { useContext, useEffect, useState } from "react";
-import NormalText from "./NormalText";
-import OtherText from "./OtherText";
+import {NormalText} from "./AppTextComponents";
+import {OtherText} from "./AppTextComponents";
 import { api } from "../services/api_base";
 import { AuthContext } from "../AuthProvider";
 import commentIsLiked from "../utils/commentIsLiked";
@@ -39,7 +39,7 @@ export default function Comment({item, setParent, setContent}){
                 <View style = {{flexDirection: 'row'}}>
                 {liked ? <CustomIcon name='heart' size={15} event={async ()=>{
                   let result = await unlikeComment(comment.id)
-                  console.log(result)
+                  //console.log(result)
                   setComment(result)
                   setLiked(false)
                   }}/>

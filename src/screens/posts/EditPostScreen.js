@@ -4,9 +4,9 @@ import {api, baseURL} from "../../services/api_base";
 import { AuthContext } from "../../AuthProvider";
 import CustomIcon from "../../components/CustomIcon";
 import User from "../../components/User";
-import { Image } from "expo-image";
+import { Post } from "expo-post";
 import { useTheme } from "@react-navigation/native";
-import editImage from "../../utils/editImage";
+import editPost from "../../utils/editPost";
 
 export default function EditPostScreen({navigation:{navigate, setOptions}, route}){
 
@@ -17,7 +17,7 @@ export default function EditPostScreen({navigation:{navigate, setOptions}, route
         headerRight: () =>
           <CustomIcon name='checkmark' size={30}
             event={async() => {
-              await editImage(id, newDescription)
+              await editPost(id, newDescription)
               navigate('Post', {id})}}
             />
         });
@@ -28,9 +28,9 @@ export default function EditPostScreen({navigation:{navigate, setOptions}, route
           <SafeAreaView style={styles.container}>
             
             <User user={user}/>
-            <Image style={[styles.image,{width: '100%'}]}
+            <Post style={[styles.post,{width: '100%'}]}
                 source={{uri: baseURL + url} }>
-            </Image>
+            </Post>
             <TextInput
             style = {styles.input}
             value={newDescription}
@@ -47,7 +47,7 @@ export default function EditPostScreen({navigation:{navigate, setOptions}, route
       container:{
         paddingVertical:20,
       },
-      image:{
+      post:{
         minHeight:300,
       },
       input:{

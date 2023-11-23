@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../AuthProvider";
 import Comment from "../../components/Comment";
 import Divider from "../../components/Divider";
-import getImageComments from "../../utils/getImageComments";
+import getPostComments from "../../utils/getPostComments";
 import newComment from "../../utils/newComment";
 
 export default function CommentsScreen({route, navigation:{navigate}}){
@@ -16,14 +16,14 @@ export default function CommentsScreen({route, navigation:{navigate}}){
   const [loading, setLoading] = useState(true);
   const[content, setContent] = useState('');
   const[parent, setParent]= useState(null);
-  const {image_id} = route.params;
+  const {post_id} = route.params;
 
   
   const postComment =async()=>{
     setLoading(true);
     if(content.trim() != ''){
-      console.log('Comment', content)
-      await newComment(content, image_id, parent)
+      //console.log('Comment', content)
+      await newComment(content, post_id, parent)
       setContent('')
       setLoading(false)
       
@@ -32,7 +32,7 @@ export default function CommentsScreen({route, navigation:{navigate}}){
 
   useEffect(() => {
     async function fetchData(){
-      let result = await getImageComments(image_id)
+      let result = await getPostComments(post_id)
       setComments(result)
       setLoading(false)
       

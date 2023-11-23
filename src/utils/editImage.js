@@ -1,9 +1,9 @@
 import { api } from "../services/api_base";
 
-export default async function editImage(id, description){
-    await api.put(`api/user/images/${id}`, {edited: true, description}).then(response => {
-      console.log("Imageeeeeeeeeeee",response.data);
+export default async function editPost(id, description){
+    await api.put(`api/user/posts/${id}`, {edited: true, description}).then(response => {
+      //console.log("Posteeeeeeeeeee",response.data);
     }).catch(error => {
-      console.log("Error", error.response);
+      //console.log("Error", error.response);
     });
   }

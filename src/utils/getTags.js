@@ -7,7 +7,7 @@ export default async function getTags(){
     return apidata.data;
     }    
   }).catch(error => {
-    console.log(error);
+    //console.log(error);
   });
 
   return result

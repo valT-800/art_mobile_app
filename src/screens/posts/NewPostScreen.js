@@ -1,22 +1,25 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Image, SafeAreaView, TextInput, View, Text, ActivityIndicator, Modal, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Button, Post, SafeAreaView, TextInput, View, Text, ActivityIndicator, Modal, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import CustomIcon from '../../components/CustomIcon';
 import getUserAlbums from '../../utils/getUserAlbums';
 import getTags from '../../utils/getTags';
-import uploadImage from '../../utils/uploadImage';
-import NormalText from '../../components/NormalText';
+import uploadPost from '../../utils/uploadPost';
+import {NormalText} from '../../components/AppTextComponents';
 import { useTheme } from '@react-navigation/native';
+import { api } from '../../services/api_base';
+import { AuthContext } from '../../AuthProvider';
 
 export default function NewPostScreen ({ navigation: {navigate, setOptions}, route }) {
   
+  const {user}=useContext(AuthContext)
   const {colors} =useTheme()
   const[description, setDescription ] = useState('');
   const[album_id, setAlbumId]=useState(null)
   const[albums, setAlbums]=useState([])
   const[loading, setLoading] =useState(true)
-  const { image, challenge_id } = route.params;
+  const { post, competition_id } = route.params;
   const[tags, setTags] = useState([])
   const[filteredTags, setFilteredTags] = useState([])
   const[allTags, setAllTags] = useState([])
@@ -30,11 +33,12 @@ export default function NewPostScreen ({ navigation: {navigate, setOptions}, rou
     });
 
      const handleUpload=async()=>{
-      console.log(description, image, album_id, challenge_id, tags)
-      let result = await uploadImage(image, description, album_id, challenge_id, {tags})
-      console.log(result)
+      api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+      //console.log(description, post, album_id, competition_id, tags)
+      let result = await uploadPost(post, description, album_id, competition_id, {tags})
+      //console.log(result)
       if(result) navigate('Post', {id: result})
-      else navigate('SelectImage'); 
+      else navigate('SelectPost'); 
        
     }
     const handleInputChange = async(text) => {
@@ -47,15 +51,15 @@ export default function NewPostScreen ({ navigation: {navigate, setOptions}, rou
         //const extractedTags = text.match(/#(\w+)/g);
         //console.log(extractedTags)
         let result = await getTags()
-        console.log(result)
+        //console.log(result)
         setAllTags(result)
         //const formattedTags = extractedTags ? extractedTags.map((tag) => tag.slice(1)) : [];
         const formattedTag = text.replace(" ", "");
-        console.log(formattedTag)
-        console.log(text.toLowerCase())
+        //console.log(formattedTag)
+        //console.log(text.toLowerCase())
         //const filtered = allTags.filter((item) => item.tag.toLowerCase().includes(text.toLowerCase().replace('#', '')));    
         const filtered = allTags.filter((item) => item.tag.toLowerCase().includes(formattedTag.toLowerCase()));
-        console.log(filtered)
+        //console.log(filtered)
         setFilteredTags(filtered);
       }
       
@@ -85,8 +89,8 @@ export default function NewPostScreen ({ navigation: {navigate, setOptions}, rou
           <View><ActivityIndicator/></View>
         ):(
           <View style = {{alignItems: 'center'}}>
-          <Image
-            source={{ uri: image }}
+          <Post
+            source={{ uri: post }}
             style={{ resizeMode: 'contain', aspectRatio: 1, width: 72 }}
           />
           <View style={{alignSelf: 'flex-start'}}>

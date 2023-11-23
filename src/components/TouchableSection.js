@@ -1,7 +1,7 @@
 import { useTheme } from "@react-navigation/native";
 import React, { useState } from "react";
 import {TouchableHighlight, TouchableOpacity, View} from "react-native";
-import NormalText from "./NormalText";
+import {NormalText} from "./AppTextComponents";
 
 const TouchableSection=({title, onPress, pressed})=>{
     const colors = useTheme()

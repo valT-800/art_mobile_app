@@ -6,10 +6,10 @@ export default followUser=async(id)=>{
       following_id: id
     }).then(response => {
       
-      console.log('Followed')
+      //console.log('Followed')
         
     })
     .catch(error => {
-      console.log(error)
+      //console.log(error)
   })
   }

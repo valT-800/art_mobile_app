@@ -1,7 +1,7 @@
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import {api} from "../../services/api_base";
 import { useState } from "react";
-import NormalText from "../../components/NormalText";
+import {NormalText} from "../../components/AppTextComponents";
 import CustomInput from "../../components/CustomInput";
 import newAlbum from "../../utils/newAlbum";
 
@@ -46,5 +46,6 @@ const styles = StyleSheet.create({
     container:{
       flex: 1,
       paddingVertical:20,
+      marginTop: 20
     },
   });

@@ -1,7 +1,7 @@
 
 import React, { useContext, useEffect, useState } from "react";
 import { Button, SafeAreaView, Text, TouchableHighligh, FlatList, TouchableHighlight, View, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from "react-native";
-import { Image } from "expo-image";
+import { Post } from "expo-post";
 import {api} from "../../services/api_base";
 import { AuthContext } from "../../AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
@@ -33,13 +33,13 @@ function EditProfileScreen({navigation: {navigate, setOptions}}){
     api.get('api/user')
       .then(response => {
         
-        console.log("User ", response.data)
+        //console.log("User ", response.data)
         setLoggedUser(response.data.data);
         setUser(response.data.data);
         setLoading(false)
       })
       .catch(error => {
-        console.log("Error", error.response);
+        //console.log("Error", error.response);
         setLoading(false)
       })
       setOptions({
@@ -53,10 +53,10 @@ function EditProfileScreen({navigation: {navigate, setOptions}}){
           {loading ? <ActivityIndicator/> :
           <View style = {{margin: 15, width: '100%', alignItems:'center'}}>
           <View style = {{alignItems:'center', padding:10}}>
-            <Image
+            <Post
             source={loggedUser.profile_photo_url}
             style={{width: 100, height: 100, borderRadius: 50}}>
-            </Image>
+            </Post>
             <TouchableOpacity><Text>Edit picture</Text></TouchableOpacity>
         </View>
             <CustomInput
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   albums: {
     alignItems: 'flex-start',
   },
-  images: {
+  posts: {
     justifyContent: 'center',
     flex: 1
     

@@ -1,34 +1,34 @@
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import {  Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {  Post, PostBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { baseURL } from "../services/api_base";
 
-export default function Challenge({challenge}){
+export default function Competition({competition}){
 
   const navigation = useNavigation();
   const[url, setUrl] = useState('https://img.freepik.com/free-vector/illustration-business-concept_53876-37559.jpg')
 
 
-  const firstImageUrl  = () => {
+  const firstPostUrl  = () => {
 
-    //console.log(album.images)
-    if(challenge.images.length > 0){
-      let image = challenge.images.shift()
-      //console.log(image.url)
-      setUrl(baseURL+image.url) 
+    //console.log(album.posts)
+    if(competition.posts.length > 0){
+      let post = competition.posts.shift()
+      //console.log(post.url)
+      setUrl(baseURL+post.url) 
     }
   }
 
     return(
-      <View style={[styles.container]}>
-      {firstImageUrl()}
-      <TouchableOpacity onPress={()=> navigation.navigate('Challenge', {id: challenge.id})}>
-        <ImageBackground source={{uri: url}}
-        style={styles.image}
-        imageStyle = {{borderRadius: 15, opacity: 0.5}}>
-          <Text style = {{padding: 5, opacity: 2}}>{challenge.title}</Text>
+      <View style={styles.container}>
+      {firstPostUrl()}
+      <TouchableOpacity onPress={()=> navigation.navigate('Competition', {id: competition.id})}>
+        <PostBackground source={{uri: url}}
+        style={styles.post}
+        postStyle = {{borderRadius: 15}}>
+          <Text style = {styles.title}>{competition.title}</Text>
         
-      </ImageBackground>
+      </PostBackground>
       </TouchableOpacity>
     </View>
                      
@@ -38,11 +38,25 @@ export default function Challenge({challenge}){
 
 const styles = StyleSheet.create({
   container:{
-    padding:10,
+    margin:5,
     elevation: 2,
-  },
-  image:{
+    borderRadius: 10,
+    shadowRadius: 10,
     height: 100,
     width: 100,
+    shadowColor:'gray'
+  },
+  post:{
+    height: 100,
+    width: 100,
+    shadowColor: 'gray',
+    shadowRadius: 2,
+    justifyContent: 'center',
+    alignItems:'center'
+  },
+  title:{
+    padding: 5,
+    color:'white',
+    fontWeight: 500
   }
 });

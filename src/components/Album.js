@@ -1,39 +1,36 @@
 import { useNavigation, useTheme } from "@react-navigation/native";
-import { StyleSheet, TouchableOpacity, View, Text, ImageBackground} from "react-native";
+import { useState } from "react";
+import { StyleSheet, TouchableOpacity, View, Text, PostBackground} from "react-native";
 import { baseURL } from "../services/api_base";
 
 export default function Album({album}){
 
   const navigation = useNavigation();
-  const {colors} = useTheme();
-  // const[url, setUrl] = useState('https://images.pexels.com/photos/1557652/pexels-photo-1557652.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500')
+  const[url, setUrl] = useState('https://posts.pexels.com/photos/1557652/pexels-photo-1557652.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500')
 
 
-  // const firstImageUrl  = () => {
+  const firstPostUrl  = () => {
 
-  //   //console.log(album.images)
-  //   if(album.images ){
-  //     let image = album.images.shift()
-  //     //console.log(image.url)
-  //     setUrl(baseURL+image.url) 
-  //   }
-  // }
+     //console.log(album.posts)
+     if(album.posts > 0){
+       let post = album.posts.shift()
+       //console.log(post.url)
+       setUrl(baseURL+post.url) 
+     }
+   }
 
     return(
-    <View style={[{backgroundColor: colors.card, shadowColor: colors.border}, styles.container]}>
-      {/* {firstImageUrl()} */}
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}> 
+    <View style={styles.container}>
+      {firstPostUrl()}
       <TouchableOpacity onPress={()=> navigation.navigate('Album', {id: album.id})}>
-      <Text style = {{padding: 5, opacity: 2}}>{album.title}</Text>
-        {/* <ImageBackground source={{uri: url}}
-        style={styles.image}
-        imageStyle = {{borderRadius: 15, opacity: 0.5}}>
+        <PostBackground source={{uri: url}}
+        style={styles.post}
+        postStyle = {{borderRadius: 15}}>
         
-          <Text style = {{padding: 5, opacity: 2}}>{album.title}</Text>
+          <Text style = {styles.title}>{album.title}</Text>
         
-      </ImageBackground> */}
+      </PostBackground>
       </TouchableOpacity>
-      </View>
     </View>
                              
     );
@@ -41,16 +38,21 @@ export default function Album({album}){
 const styles = StyleSheet.create({
   container:{
     margin:5,
-    elevation: 2,
-    shadowRadius: 10,
-    borderRadius: 10,
     height: 100,
     width: 100,
+    shadowColor:'gray'
   },
-  image:{
+  post:{
     height: 100,
     width: 100,
     shadowColor: 'gray',
-    shadowRadius: 2
+    shadowRadius: 10,
+    justifyContent: 'center',
+    alignItems:'center',
+    elevation: 10
+  },
+  title:{
+    color:'white',
+    fontWeight: 500
   }
 });

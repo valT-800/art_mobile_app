@@ -1,7 +1,7 @@
 
 import React, { useContext } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import NormalText from './NormalText';
+import {NormalText} from './AppTextComponents';
 import Divider from './Divider';
 
 export default TouchableListItem = ({onPress, title}) => {

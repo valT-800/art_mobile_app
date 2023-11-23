@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "./screens/HomeScreen";
 import CustomButton from "./components/CustomButton";
-import NormalText from "./components/NormalText";
+import {NormalText} from "./components/AppTextComponents";
 import { useScrollToTop } from "@react-navigation/native";
 import CustomInput from "./components/CustomInput";
 

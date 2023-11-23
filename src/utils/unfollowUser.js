@@ -5,9 +5,9 @@ export default unfollowUser = async(id)=>{
       unfollow: true,
       following_id: id
     }).then(response => {
-      console.log('Unfollowed')
+      //console.log('Unfollowed')
     })
     .catch(error => {
-      console.log(error)
+      //console.log(error)
   })
 }

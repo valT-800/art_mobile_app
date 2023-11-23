@@ -1,17 +1,17 @@
 import { useNavigation } from "@react-navigation/native";
 import { FlatList, SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
-import getChallenges from "../../utils/getChallenges";
-import Challenge from "../../components/Challenge";
+import getCompetitions from "../../utils/getCompetitions";
+import Competition from "../../components/Competition";
 
-export default function ChallengesScreen({route, navigation:{navigate}}){
+export default function CompetitionsScreen({route, navigation:{navigate}}){
   
-  const [challenges, setChallenges] = useState([]);
+  const [competitions, setCompetitions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData(){
-      let result = await getChallenges(id)
-      setChallenges(result)
+      let result = await getCompetitions(id)
+      setCompetitions(result)
       setLoading(false)
     }
     fetchData()
@@ -19,11 +19,11 @@ export default function ChallengesScreen({route, navigation:{navigate}}){
   return(
     <SafeAreaView style={styles.container}>
       {loading ? <ActivityIndicator/> : 
-        <View style={styles.challenges}>
+        <View style={styles.competitions}>
             <FlatList
-              data={challenges}
+              data={competitions}
               renderItem={({item}) => {
-              return(<Challenge image={item}></Challenge>)}}
+              return(<Competition post={item}></Competition>)}}
               numColumns={3}
               keyExtractor = {( item, index) => item.id }
             ></FlatList>
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center'
   },
-  challenges: {
+  competitions: {
     flex: 1,
     justifyContent: 'center'
   }

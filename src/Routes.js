@@ -22,22 +22,6 @@ export default function Routes() {
     setCustomColorScheme(scheme);
   };
 
-  /*useEffect(() => {
-    const getUserFromStorage = async () => {
-      try {
-        const userString = await AsyncStorage.getItem('user');
-        if (userString) {
-          const userObject = JSON.parse(userString);
-          setUser(userObject);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getUserFromStorage();
-  }, []);*/
-
   useEffect(() => {
     // check if the user is logged in or not
     
@@ -47,7 +31,7 @@ export default function Routes() {
           // decode it
           // login();
           userObject = JSON.parse(userString)
-          console.log("User check ", userObject)
+          //console.log("User check ", userObject)
           setUser(userObject);
           
         }
@@ -55,10 +39,10 @@ export default function Routes() {
         api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
         api.get('api/user')
         .then(response => {
-          console.log("User ", response.data.data)
+          //console.log("User ", response.data.data)
         })
         .catch(error => {
-          console.log("Error", error.response);
+          //console.log("Error", error.response);
           SecureStore.deleteItemAsync('user');
           setUser(null);
         })
@@ -68,7 +52,7 @@ export default function Routes() {
         //SecureStore.deleteItemAsync('user');
       })
       .catch(err => {
-        console.log("Error", err);
+        //console.log("Error", err);
         setLoading(false);
       })
   }, [loading]);

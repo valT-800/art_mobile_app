@@ -9,7 +9,8 @@ const Divider =()=>{
 export default Divider;
 const styles = StyleSheet.create({
 viewStyleForLine: {
-    borderBottomColor: "grey", 
+    color: '#dcdcdc',
+    borderBottomColor: '#dcdcdc', 
     borderBottomWidth: StyleSheet.hairlineWidth,
     alignSelf:'stretch',
     width: "100%"

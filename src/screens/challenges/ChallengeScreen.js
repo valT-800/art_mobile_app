@@ -1,22 +1,22 @@
 import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
 import React, { useContext, useEffect, useState } from 'react';
-import BoldText from "../../components/BoldText";
-import NormalText from "../../components/NormalText";
+import {BoldText, Header} from "../../components/AppTextComponents";
+import {NormalText} from "../../components/AppTextComponents";
 import CustomButton from "../../components/CustomButton";
-import ImageComponent from "../../components/Image";
-import getChallenge from "../../utils/getChallenge";
+import PostComponent from "../../components/Post";
+import getCompetition from "../../utils/getCompetition";
 
-export default function ChallengeScreen({route, navigation:{navigate}}){
+export default function CompetitionScreen({route, navigation:{navigate}}){
 
-  const[challenge,setChallenge]=useState({});
+  const[competition,setCompetition]=useState({});
   const [loading, setLoading] = useState(true);
 
   const{id} = route.params;
 
   useEffect(() => {
     async function fetchData(){
-      let result = await getChallenge(id)
-      setChallenge(result)
+      let result = await getCompetition(id)
+      setCompetition(result)
       setLoading(false)
     }
     fetchData()
@@ -33,17 +33,17 @@ export default function ChallengeScreen({route, navigation:{navigate}}){
     return(
         <SafeAreaView style= {styles.container}>
           <View style = {{padding: 10, alignItems: 'center'}}>
-            <BoldText text={challenge.title}/>
-            <NormalText text={challenge.description}/>
-            <CustomButton title="Participate" onPress={()=>navigate('AddToChallenge', {id})} />
+            <Header text={competition.title}/>
+            <NormalText text={competition.description}/>
+            <CustomButton title="Participate" onPress={()=>navigate('AddToCompetition', {id})} />
           </View>
           
-          <View style={styles.images}>
-            {challenge.images &&
+          <View style={styles.posts}>
+            {competition.posts &&
             <FlatList
-              data={challenge.images}
+              data={competition.posts}
               renderItem={({item}) => {
-              return(<ImageComponent image={item}></ImageComponent>)}}
+              return(<PostComponent post={item}></PostComponent>)}}
               numColumns={3}
               keyExtractor = {( item, index) => item.id }
             ></FlatList>
@@ -58,9 +58,11 @@ export default function ChallengeScreen({route, navigation:{navigate}}){
 const styles = StyleSheet.create({
     container:{
       justifyContent: 'center',
-      flex: 1
+      flex: 1,
+      marginTop: 30,
+      paddingTop: 20
     },
-    images: {
+    posts: {
       justifyContent: 'center',
       flex: 1
     }

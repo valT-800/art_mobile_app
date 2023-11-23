@@ -2,19 +2,19 @@ import React, { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import SearchBar from "../components/SearchBar";
 import Album from "../components/Album";
-import Challenge from "../components/Challenge";
+import Competition from "../components/Competition";
 import {api} from "../services/api_base";
 import { AuthContext } from "../AuthProvider";
-import ImageComponent from "../components/Image";
+import PostComponent from "../components/Post";
 import List from "../components/SearchList";
-import NormalText from "../components/NormalText";
+import { NormalText } from "../components/AppTextComponents";
 
 function GlobalScreen({navigation: {navigate}}){
     
     const{user} = useContext(AuthContext)
-    const [challenges, setChallenges] = useState([])
+    const [competitions, setCompetitions] = useState([])
     const [albums, setAlbums] = useState([])
-    const [images, setImages] = useState([])
+    const [posts, setPosts] = useState([])
     const[loading, setLoading]=useState(true)
   const [searchPhrase, setSearchPhrase] = useState("");
   const [clicked, setClicked] = useState(false);
@@ -23,13 +23,13 @@ function GlobalScreen({navigation: {navigate}}){
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-    const getChallenges=()=>{
-        api.get('/api/challenges')
+    const getCompetitions=()=>{
+        api.get('/api/competitions')
         .then(response => {
-            setChallenges(response.data.data)
+            setCompetitions(response.data.data)
         })
         .catch(error => {
-            console.log(error.response);
+            //console.log(error.response);
         })
     }
     const getAlbums=()=>{
@@ -37,41 +37,39 @@ function GlobalScreen({navigation: {navigate}}){
         .then(response => {
         setAlbums(response.data.data);})
         .catch(error => {
-            console.log(error.response);
+            //console.log(error.response);
         })
     }
 
-    const getImages=()=>{
-        api.get(`api/images/?page=${currentPage}`)
-        .then(response => {
-            //console.log("API Response:", response.data); // Log the response for debugging
-            const { data, meta } = response.data;
-            const imagesArray = Object.values(data); // Convert the object into an array of objects
-            setImages((prevImages) => [...prevImages, ...imagesArray]);
-            setTotalPages(meta.last_page);
-            setLoading(false);
-    })
-        .catch(error => {
-            console.log(error.response);
-            setLoading(false)
-        })
+    const getPosts = async () => {
+        
+        await api.get(`api/posts/?page=${currentPage}`).then(response => {
+          const { data, meta } = response.data;
+          const postsArray = Object.values(data); 
+          setPosts((prevPosts) => [...prevPosts, ...postsArray]);
+          setTotalPages(meta.last_page);
+          setLoading(false);
+        }).catch(error => {
+          //console.log("Error", error);
+          setLoading(false);
+      });
     }
 
     const handleScrollEnd = (event) => {
-          console.log(currentPage)
+          //console.log(currentPage)
           if (currentPage < totalPages) {
             
           setCurrentPage((prevPage) => prevPage + 1);
-          console.log(currentPage)
+          //console.log(currentPage)
           setLoading(true);
-          //getImages() 
+          //getPosts() 
         }
       };
 
     useEffect(()=>{
         getAlbums();
-        getChallenges();
-        getImages();
+        getCompetitions();
+        getPosts();
     
 
     },[currentPage])
@@ -110,7 +108,7 @@ function GlobalScreen({navigation: {navigate}}){
                         return(<Album album={item}></Album>)}}
                     ></FlatList>
                 </View>
-                <NormalText text = "Challenges" />
+                <NormalText text = "Competitions" />
                 <View style = {styles.albums}>
                     <FlatList
                         keyExtractor = {( item) => item.id }
@@ -120,21 +118,21 @@ function GlobalScreen({navigation: {navigate}}){
                         }}
                         horizontal={true}
                         nestedScrollEnabled={true}
-                        data={challenges}
+                        data={competitions}
                         renderItem={({item}) => {
-                        return(<Challenge challenge={item}></Challenge>)}}
+                        return(<Competition competition={item}></Competition>)}}
                 ></FlatList>
                 </View>
-                <View style={styles.images}>
+                <View style={styles.posts}>
                 <FlatList
-                data={images}
+                data={posts}
                 renderItem={({item}) => {
-                return(<ImageComponent image={item}></ImageComponent>)}}
+                return(<PostComponent post={item}></PostComponent>)}}
                 numColumns={3}
                 keyExtractor = {( item, index) => item.id }
                 ></FlatList>
             </View>
-            {loading && <ActivityIndicator/>}
+            {loading && <ActivityIndicator size={'large'}/>}
             </ScrollView>
           </View>
           )}
@@ -148,12 +146,12 @@ export default GlobalScreen;
 const styles = StyleSheet.create({
     container:{
         justifyContent: 'flex-start',
-        flex: 1,
+        flex: 1
     },
     albums: {
         alignItems: 'flex-start',
     },
-    images: {
+    posts: {
       justifyContent: 'center',
       flex: 1
       

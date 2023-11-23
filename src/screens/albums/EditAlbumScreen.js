@@ -1,7 +1,7 @@
 import {useState } from "react";
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import CustomInput from "../../components/CustomInput";
-import NormalText from "../../components/NormalText";
+import {NormalText} from "../../components/AppTextComponents";
 import editAlbum from "../../utils/editAlbum";
 
 export default function EditAlbumScreen({route, navigation:{navigate, setOptions}}){
@@ -41,9 +41,10 @@ export default function EditAlbumScreen({route, navigation:{navigate, setOptions
 const styles = StyleSheet.create({
   container:{
     justifyContent: 'center',
-    flex: 1
+    flex: 1,
+    marginTop: 20
   },
-  images: {
+  posts: {
     justifyContent: 'center',
     flex: 1
   },

@@ -3,10 +3,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { Button, SafeAreaView, Text, TouchableHighligh, FlatList, TouchableHighlight, View, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
 import { AuthContext } from "../../AuthProvider";
 import Album from "../../components/Album";
-import ImageComponent from "../../components/Image";
-import { Image } from "expo-image";
-import NormalText from "../../components/NormalText";
-import OtherText from "../../components/OtherText";
+import PostComponent from "../../components/Post";
+import { Post } from "expo-post";
+import {NormalText} from "../../components/AppTextComponents";
+import {OtherText} from "../../components/AppTextComponents";
 import { api } from "../../services/api_base";
 import CustomButton from "../../components/CustomButton";
 import unfollowUser from "../../utils/unfollowUser";
@@ -15,56 +15,56 @@ function UserProfileScreen({navigation: {navigate}, route}){
 
   const { user} = useContext(AuthContext)
   const[otherUser, setOtherUser] = useState({})
-  const[images, setImages] = useState([])
-  const[loadingImages, setLoadingImages] = useState(true)
+  const[posts, setPosts] = useState([])
+  const[loadingPosts, setLoadingPosts] = useState(true)
   const[loadingUser, setLoadingUser] = useState(true)
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   
   const{id} =route.params;
 
-  function getImagesWithoutAlbum(id){
-    api.get(`api/images/noalbum/user/${id}/?page=${currentPage}`)
+  function getPostsWithoutAlbum(id){
+    api.get(`api/posts/noalbum/user/${id}/?page=${currentPage}`)
       .then(response => {
         const { data, meta } = response.data;
-        setImages((prevImages) => [...prevImages, ...data]);
+        setPosts((prevPosts) => [...prevPosts, ...data]);
         setTotalPages(meta.pagination.last_page);
-        setLoadingImages(false)
+        setLoadingPosts(false)
       })
       .catch(error => {
-        console.log(error.response);
-        setLoadingImages(false)
+        //console.log(error.response);
+        setLoadingPosts(false)
     })
   }
   
   
   const isFollowing = (user_id) => {
-    console.log(user_id)
+    //console.log(user_id)
     return otherUser.followers && otherUser.followers.some((follower) => follower.id == user_id);
     
   };
 
   const handleScrollEnd = (event) => {
-    setLoadingImages(true)
-      console.log(currentPage)
+    setLoadingPosts(true)
+      //console.log(currentPage)
       if (currentPage < totalPages) {
         
         setCurrentPage((prevPage) => prevPage + 1);
-        console.log(currentPage)
+        //console.log(currentPage)
     }
   };
   const getUser = async()=>{
     await api.get(`api/users/${id}`)
       .then(response => {
         
-        console.log("Other user ", response.data.data)
+        //console.log("Other user ", response.data.data)
         setOtherUser(response.data.data);
         
         setLoadingUser(false)
       }
       )
       .catch(error => {
-        console.log("Error", error.response);   
+        //console.log("Error", error.response);   
         setLoadingUser(false)
       })   
   }
@@ -73,7 +73,7 @@ function UserProfileScreen({navigation: {navigate}, route}){
   }, [loadingUser]);
   
   useEffect(()=>{
-    getImagesWithoutAlbum(id)
+    getPostsWithoutAlbum(id)
   }, [currentPage])
   
   return(
@@ -82,10 +82,10 @@ function UserProfileScreen({navigation: {navigate}, route}){
           {loadingUser ? <ActivityIndicator/> : 
           <ScrollView onScrollEndDrag={handleScrollEnd} scrollEventThrottle={16}>
           <View style={{alignItems: 'center'}}>
-            <Image
+            <Post
             source={otherUser.profile_photo_url}
             style={{width: 100, height: 100, borderRadius: 50}}>
-            </Image>
+            </Post>
             <NormalText text={otherUser.name}/>
             <OtherText text={otherUser.email}/>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', width: 170}}>
@@ -115,16 +115,16 @@ function UserProfileScreen({navigation: {navigate}, route}){
             ></FlatList>
           </View>
 
-          <View style={styles.images}>
+          <View style={styles.posts}>
             <FlatList
-              data={images}
+              data={posts}
               renderItem={({item}) => {
-              return(<ImageComponent image={item}></ImageComponent>)}}
+              return(<PostComponent post={item}></PostComponent>)}}
               numColumns={3}
               keyExtractor = {( item, index) => item.id }
             ></FlatList>
           </View>
-          {loadingImages && <ActivityIndicator></ActivityIndicator>}
+          {loadingPosts && <ActivityIndicator></ActivityIndicator>}
           </ScrollView>}
         </SafeAreaView>
     )
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   albums: {
     alignItems: 'flex-start',
   },
-  images: {
+  posts: {
     justifyContent: 'center',
     flex: 1
     

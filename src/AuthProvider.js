@@ -25,7 +25,7 @@ export const AuthProvider = ({children}) => {
                 confirmation_password,
                 
             }).then(response => {
-                console.log('Data:', response.data.data);
+                //console.log('Data:', response.data.data);
                 data = response.data.data;
                 
                 const userResponse = {
@@ -39,7 +39,7 @@ export const AuthProvider = ({children}) => {
                 SecureStore.setItemAsync('user', JSON.stringify(userResponse));
             })
             .catch(error => {
-              console.log('Register error:', error.response.data);
+              //console.log('Register error:', error.response.data);
               setError(error.response.data);
             })
         },
@@ -49,7 +49,7 @@ export const AuthProvider = ({children}) => {
             password,
           })
           .then(response => {
-            console.log('Data:', response.data.data);
+            //console.log('Data:', response.data.data);
             data = response.data.data;
             
             const userResponse = {
@@ -58,7 +58,7 @@ export const AuthProvider = ({children}) => {
               username: data.username,
               token: data.token,
             }
-            console.log("User response ", userResponse.token);
+            //console.log("User response ", userResponse.token);
             
             setUser(userResponse);
             
@@ -66,7 +66,7 @@ export const AuthProvider = ({children}) => {
             SecureStore.setItemAsync('user', JSON.stringify(userResponse));
           })
           .catch(error => {
-            console.log('Login error:', error.response.data);
+            //console.log('Login error:', error.response.data);
             setError(error.response.data);
           })
         },     
@@ -74,19 +74,19 @@ export const AuthProvider = ({children}) => {
           api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
           api.post('api/logout')
           .then(response => {
-            console.log("Logout response: ", response)
+            //console.log("Logout response: ", response)
             setUser(null);
             SecureStore.deleteItemAsync('user');
           })
           .catch(error => {
-            console.log("Logout error: ", error.response);
+            //console.log("Logout error: ", error.response);
           })
         },
         update: (name, username, email)=>{
           api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-          api.put('api/user/update', {name, username, email})
+          api.put('api/user/update', {edited: true, name, username, email})
           .then(response => {
-            console.log('Data:', response.data.data);
+            //console.log('Data:', response.data.data);
             data = response.data.data;
             
             const userResponse = {
@@ -95,7 +95,7 @@ export const AuthProvider = ({children}) => {
               username: data.username,
               token: data.token,
             }
-            console.log("User response ", userResponse.token);
+            //console.log("User response ", userResponse.token);
             
             setUser(userResponse);
             
@@ -103,7 +103,7 @@ export const AuthProvider = ({children}) => {
             SecureStore.setItemAsync('user', JSON.stringify(userResponse));
           })
           .catch(error => {
-            console.log('Update error:', error.response.data);
+            //console.log('Update error:', error.response.data);
             setError(error.response.data);
           })
         }

@@ -1,37 +1,31 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import BoldText from '../../components/BoldText';
+import * as PostPicker from 'expo-post-picker';
+import {BoldText} from '../../components/AppTextComponents';
 import CustomButton from '../../components/CustomButton';
-import pickImageFromGallery from '../../utils/pickImageFromGallery';
+import pickPostFromGallery from '../../utils/pickPostFromGallery';
 import takePhoto from '../../utils/takePhoto';
 
-const options = {
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-};
 
-export default function SelectImageScreen ({navigation: {navigate}}) {
-  const [image, setImage] = useState(null);
+export default function SelectPostScreen ({navigation: {navigate}}) {
+  const [post, setPost] = useState(null);
 
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await pickImageFromGallery()
-    setImage(result);
-    image ? navigate('NewPost', { image, challenge_id: null }) : pickImage
+  const pickPost = async () => {
+    // No permissions request is necessary for launching the post library
+    let result = await pickPostFromGallery()
+    setPost(result);
+    post ? navigate('NewPost', { post, competition_id: null }) : pickPost
   };
 
   const openCamera = async () => {
     let result = await takePhoto()
-      setImage(result);
-      image ? navigate('NewPost', { image, challenge_id: null }) : openCamera
+      setPost(result);
+      post ? navigate('NewPost', { post, competition_id: null }) : openCamera
 }
 
     return (
       <View style={styles.container}>
-        <CustomButton title='Select from gallery' onPress={pickImage}>
+        <CustomButton title='Select from gallery' onPress={pickPost}>
         </CustomButton>
         <CustomButton title = 'Take photo' onPress={openCamera}>
         </CustomButton>

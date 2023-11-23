@@ -20,7 +20,7 @@ api.interceptors.request.use(
     if(user){
     if (user && user.token) {
       config.headers.Authorization = `Bearer ${user.token}`;
-      console.log("User token ", user.token)
+      //console.log("User token ", user.token)
     }
     return config;
   }},

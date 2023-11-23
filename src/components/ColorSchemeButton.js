@@ -3,7 +3,7 @@
 import React, { useContext } from 'react';
 import { CustomColorSchemeContext } from '../screens/CustomColorScheme';
 import { TouchableOpacity, View } from 'react-native';
-import NormalText from './NormalText';
+import {NormalText} from './AppTextComponents';
 import TouchableListItem from './TouchableListItem';
 
 const ColorSchemeButton = () => {

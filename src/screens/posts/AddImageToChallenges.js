@@ -1,34 +1,34 @@
 import React, { useState } from 'react';
-import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import { FlatList, Post, StyleSheet, Text, View } from 'react-native';
+import * as PostPicker from 'expo-post-picker';
 import CustomButton from '../../components/CustomButton';
-import pickImageFromGallery from '../../utils/pickImageFromGallery';
+import pickPostFromGallery from '../../utils/pickPostFromGallery';
 import takePhoto from '../../utils/takePhoto';
 
-export default function SelectImageScreen ({navigation: {navigate}, route}) {
+export default function SelectPostScreen ({navigation: {navigate}, route}) {
     const{id} = route.params;
-    const [image, setImage] = useState(null);
+    const [post, setPost] = useState(null);
     
-    const pickImage = async () => {
-        // No permissions request is necessary for launching the image library
-    let result = await pickImageFromGallery()
-    setImage(result);
-    image ? navigate('NewPost', { image, challenge_id: id }) : pickImage
+    const pickPost = async () => {
+        // No permissions request is necessary for launching the post library
+    let result = await pickPostFromGallery()
+    setPost(result);
+    post ? navigate('NewPost', { post, competition_id: id }) : pickPost
     
   };
 
   const openCamera = async () => {
       let result = await takePhoto()
-        setImage(result);
-        image ? navigate('NewPost', { image, challenge_id: id }) : openCamera
+        setPost(result);
+        post ? navigate('NewPost', { post, competition_id: id }) : openCamera
   }
 
   
 
     return (
       <View style={styles.container}>
-        {id && <CustomButton title = 'Select from existing' onPress={()=>navigate('PickImageFromApp', {id})}></CustomButton>}
-        <CustomButton title='Select from gallery' onPress={pickImage}>
+        {id && <CustomButton title = 'Select from existing' onPress={()=>navigate('PickPostFromApp', {id})}></CustomButton>}
+        <CustomButton title='Select from gallery' onPress={pickPost}>
         </CustomButton>
         <CustomButton title = 'Take photo' onPress={openCamera}>
         </CustomButton>

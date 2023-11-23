@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Image } from 'expo-image';
+import { Post } from 'expo-post';
 import { api, baseURL } from '../../services/api_base';
-import NormalText from '../../components/NormalText';
-import addImageToChallenges from '../../utils/addImageToChallenges';
+import {NormalText} from '../../components/AppTextComponents';
+import addPostToCompetitions from '../../utils/addPostToCompetitions';
 
 
-function PickImageFromApp({navigation:{navigate}, route}){
+function PickPostFromApp({navigation:{navigate}, route}){
     const{id} = route.params;
-    const[images, setImages] = useState([])
+    const[posts, setPosts] = useState([])
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
@@ -21,14 +21,14 @@ function PickImageFromApp({navigation:{navigate}, route}){
       
       useEffect(() => {
         
-        api.get('api/user/images')
+        api.get('api/user/posts')
           .then(response => {
             const{data, meta} = response.data;
-            setImages((prevImage) => [...prevImage, ...data]);
+            setPosts((prevPost) => [...prevPost, ...data]);
             setTotalPages(meta.total_pages);
           })
           .catch(error => {
-            console.log("Error", error.response);   
+            //console.log("Error", error.response);   
           })   
           
       }, [currentPage]);
@@ -38,7 +38,7 @@ function PickImageFromApp({navigation:{navigate}, route}){
         <NormalText text='Pick'/>
         <View style={styles.container}>
         <FlatList
-            data={images}
+            data={posts}
               renderItem={({item}) => {
               return(
                 <View style={{
@@ -48,10 +48,10 @@ function PickImageFromApp({navigation:{navigate}, route}){
                 }}>
                 <TouchableOpacity
                 onPress={async()=> {
-                  addImageToChallenges(item.id, {id})
-                  navigate('Challenge', {id})}}>
-                    <Image style={styles.image}
-                        source={baseURL + item.url }></Image>
+                  addPostToCompetitions(item.id, {id})
+                  navigate('Competition', {id})}}>
+                    <Post style={styles.post}
+                        source={baseURL + item.url }></Post>
                     </TouchableOpacity>
                 </View>
               )}}
@@ -64,7 +64,7 @@ function PickImageFromApp({navigation:{navigate}, route}){
     </SafeAreaView>
     )
   }
-  export default PickImageFromApp;
+  export default PickPostFromApp;
 
   
 const styles = StyleSheet.create({
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       flex: 1
     },
-    image:{
+    post:{
         height: 150,
         justifyContent: 'center',
         alignItems: 'center',

@@ -27,7 +27,7 @@ export default function AlbumsScreen({route, navigation:{navigate}}){
             <FlatList
               data={albums}
               renderItem={({item}) => {
-              return(<Album image={item}></Album>)}}
+              return(<Album post={item}></Album>)}}
               numColumns={3}
               keyExtractor = {( item, index) => item.id }
             ></FlatList>
@@ -41,7 +41,8 @@ const styles = StyleSheet.create({
     container:{
       paddingVertical:20,
       flex: 1,
-      justifyContent: 'center'
+      justifyContent: 'center',
+      marginTop: 20
     },
     albums: {
       flex: 1,
