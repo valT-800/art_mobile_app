@@ -6,8 +6,8 @@ import { AuthContext } from "../../AuthProvider";
 import * as SecureStore from 'expo-secure-store'
 import { Ionicons } from "@expo/vector-icons";
 import Album from "../../components/Album";
-import PostComponent from "../../components/Post";
-import { Post } from "expo-post";
+import ImageComponent from "../../components/Image";
+import { Image } from "expo-image";
 import CustomButton from "../../components/CustomButton";
 import {NormalText} from "../../components/AppTextComponents";
 import {OtherText} from "../../components/AppTextComponents";
@@ -131,10 +131,10 @@ function ProfileScreen({navigation: {navigate}}){
             <RefreshControl refreshing={loadingUser} onRefresh={onUserRefresh} />
           }>
           <View style={{alignItems: 'center'}}>
-            <Post
+            <Image
             source={loggedUser.profile_photo_url}
             style={{width: 100, height: 100, borderRadius: 50}}>
-            </Post>
+            </Image>
             <NormalText text={loggedUser.name}/>
             <OtherText text={loggedUser.email}/>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', width: 170}}>
@@ -194,7 +194,7 @@ function ProfileScreen({navigation: {navigate}}){
             <FlatList
               data={posts}
               renderItem={({item}) => {
-              return(<PostComponent post={item}></PostComponent>)}}
+              return(<ImageComponent post={item}></ImageComponent>)}}
               numColumns={3}
               keyExtractor = {( item, index) => item.id }
               // onEndReached={handleLoadMore}

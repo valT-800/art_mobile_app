@@ -1,12 +1,12 @@
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { useState } from "react";
-import { StyleSheet, TouchableOpacity, View, Text, PostBackground} from "react-native";
+import { StyleSheet, TouchableOpacity, View, Text, ImageBackground} from "react-native";
 import { baseURL } from "../services/api_base";
 
 export default function Album({album}){
 
   const navigation = useNavigation();
-  const[url, setUrl] = useState('https://posts.pexels.com/photos/1557652/pexels-photo-1557652.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500')
+  const[url, setUrl] = useState('https://studioandme.co.za/wp-content/uploads/2021/03/Creative_Minimal_Abstract_Art-Print_2_A4.pdf.png')
 
 
   const firstPostUrl  = () => {
@@ -23,13 +23,13 @@ export default function Album({album}){
     <View style={styles.container}>
       {firstPostUrl()}
       <TouchableOpacity onPress={()=> navigation.navigate('Album', {id: album.id})}>
-        <PostBackground source={{uri: url}}
-        style={styles.post}
+        <ImageBackground source={{uri: url}}
+        style={styles.image}
         postStyle = {{borderRadius: 15}}>
         
           <Text style = {styles.title}>{album.title}</Text>
         
-      </PostBackground>
+      </ImageBackground>
       </TouchableOpacity>
     </View>
                              
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     width: 100,
     shadowColor:'gray'
   },
-  post:{
+  image:{
     height: 100,
     width: 100,
     shadowColor: 'gray',

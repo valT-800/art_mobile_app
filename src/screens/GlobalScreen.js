@@ -5,7 +5,7 @@ import Album from "../components/Album";
 import Competition from "../components/Competition";
 import {api} from "../services/api_base";
 import { AuthContext } from "../AuthProvider";
-import PostComponent from "../components/Post";
+import ImageComponent from "../components/Image";
 import List from "../components/SearchList";
 import { NormalText } from "../components/AppTextComponents";
 
@@ -127,7 +127,7 @@ function GlobalScreen({navigation: {navigate}}){
                 <FlatList
                 data={posts}
                 renderItem={({item}) => {
-                return(<PostComponent post={item}></PostComponent>)}}
+                return(<ImageComponent post={item}></ImageComponent>)}}
                 numColumns={3}
                 keyExtractor = {( item, index) => item.id }
                 ></FlatList>

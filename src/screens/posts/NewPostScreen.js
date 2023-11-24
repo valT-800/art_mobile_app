@@ -38,7 +38,7 @@ export default function NewPostScreen ({ navigation: {navigate, setOptions}, rou
       let result = await uploadPost(post, description, album_id, competition_id, {tags})
       //console.log(result)
       if(result) navigate('Post', {id: result})
-      else navigate('SelectPost'); 
+      else navigate('SelectImage'); 
        
     }
     const handleInputChange = async(text) => {

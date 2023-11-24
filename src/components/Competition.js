@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import {  Post, PostBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {  Post, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { baseURL } from "../services/api_base";
 
 export default function Competition({competition}){
@@ -23,12 +23,12 @@ export default function Competition({competition}){
       <View style={styles.container}>
       {firstPostUrl()}
       <TouchableOpacity onPress={()=> navigation.navigate('Competition', {id: competition.id})}>
-        <PostBackground source={{uri: url}}
+        <ImageBackground source={{uri: url}}
         style={styles.post}
         postStyle = {{borderRadius: 15}}>
           <Text style = {styles.title}>{competition.title}</Text>
         
-      </PostBackground>
+      </ImageBackground>
       </TouchableOpacity>
     </View>
                      

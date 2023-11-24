@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import * as PostPicker from 'expo-post-picker';
+import * as PostPicker from 'expo-image-picker';
 import {BoldText} from '../../components/AppTextComponents';
 import CustomButton from '../../components/CustomButton';
 import pickPostFromGallery from '../../utils/pickPostFromGallery';
 import takePhoto from '../../utils/takePhoto';
 
 
-export default function SelectPostScreen ({navigation: {navigate}}) {
+export default function SelectImageScreen ({navigation: {navigate}}) {
   const [post, setPost] = useState(null);
 
   const pickPost = async () => {
