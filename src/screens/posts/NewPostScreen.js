@@ -1,11 +1,11 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Post, SafeAreaView, TextInput, View, Text, ActivityIndicator, Modal, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { Button, Post, SafeAreaView, TextInput, View, Text, ActivityIndicator, Modal, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import CustomIcon from '../../components/CustomIcon';
 import getUserAlbums from '../../utils/getUserAlbums';
 import getTags from '../../utils/getTags';
-import uploadPost from '../../utils/uploadPost';
+//import uploadPost from '../../utils/uploadPost';
 import {NormalText} from '../../components/AppTextComponents';
 import { useTheme } from '@react-navigation/native';
 import { api } from '../../services/api_base';
@@ -19,7 +19,7 @@ export default function NewPostScreen ({ navigation: {navigate, setOptions}, rou
   const[album_id, setAlbumId]=useState(null)
   const[albums, setAlbums]=useState([])
   const[loading, setLoading] =useState(true)
-  const { post, competition_id } = route.params;
+  const { image, competition_id } = route.params;
   const[tags, setTags] = useState([])
   const[filteredTags, setFilteredTags] = useState([])
   const[allTags, setAllTags] = useState([])
@@ -33,14 +33,34 @@ export default function NewPostScreen ({ navigation: {navigate, setOptions}, rou
     });
 
      const handleUpload=async()=>{
-      api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-      //console.log(description, post, album_id, competition_id, tags)
-      let result = await uploadPost(post, description, album_id, competition_id, {tags})
-      //console.log(result)
-      if(result) navigate('Post', {id: result})
-      else navigate('SelectImage'); 
+      console.log(description, image, album_id, competition_id, tags)
+      let result = await uploadPost(image, description, album_id, competition_id)
+      console.log(result)
+      if(result) navigate('Post', {id: result.data})
+      //else navigate('NewContent'); 
        
     }
+    async function uploadPost(image, description, album_id, competition_id){
+      let filename = image.toString();
+      let match = /\.(\w+)$/.exec(filename);
+      let type = match ? `image/${match[1]}` : `image`;
+      console.log(image,description,filename,type)
+      let formData = new FormData();
+      formData.append('image', { uri:image, name: filename, type });
+      formData.append('description', description)
+      if(album_id!=null || album_id!=undefined) formData.append('album_id', album_id)
+      //if(competition_id!=null || competition_id!=undefined) formData.append('competition_id', competition_id)
+      api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+      let result = await api.post('api/user/posts', formData, 
+      {headers: { 'Accept': 'application/json','Content-Type': 'multipart/form-data',}})
+      .then((response) => {
+          //console.log('Post uploaded successfully.', response.data)
+          return response.data
+            
+      }).catch((err) => console.log('Error post image', err.message))
+      return result
+    }
+
     const handleInputChange = async(text) => {
 
       setInputValue(text)
@@ -75,9 +95,14 @@ export default function NewPostScreen ({ navigation: {navigate, setOptions}, rou
 
   useEffect(() => {
     async function fetchData(){
-      let result = await getUserAlbums()
-      setAlbums(result)
-      setLoading(false)
+      await api.get(`api/albums-short/user/${user.id}`).then(response => {
+        console.log(response.data)
+        setAlbums(response.data.data)
+        setLoading(false)
+      }).catch(error => {
+        console.log("Error", error);
+        setLoading(false)
+    });
       
     }
     fetchData()
@@ -88,10 +113,10 @@ export default function NewPostScreen ({ navigation: {navigate, setOptions}, rou
         {loading ? (
           <View><ActivityIndicator/></View>
         ):(
-          <View style = {{alignItems: 'center'}}>
-          <Post
-            source={{ uri: post }}
-            style={{ resizeMode: 'contain', aspectRatio: 1, width: 72 }}
+          <View style = {{alignItems: 'center', minHeight:'50%'}}>
+          <Image
+            source={{ uri: image }}
+            style={{ resizeMode: 'contain', aspectRatio: 1, width: 350 }}
           />
           <View style={{alignSelf: 'flex-start'}}>
           <TextInput
