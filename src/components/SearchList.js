@@ -16,6 +16,7 @@ import getCompetitions from "../utils/getCompetitions";
 import TouchableSection from "./TouchableSection";
 import User from "./User";
 import Competition from "./Competition";
+import getExhibitions from "../utils/getExhibitions";
 
 // definition of the Item, which will be rendered in the FlatList
 const Item = ({item, onPress}) => (
@@ -23,7 +24,6 @@ const Item = ({item, onPress}) => (
   <View style={styles.item}>
     <TouchableOpacity onPress={onPress}>
     <BoldText text={item.title}/>
-    <NormalText text={item.description}/>
     </TouchableOpacity>
   </View>
 );
@@ -55,11 +55,23 @@ const List = ({searchPhrase, setClicked, data, setData}) => {
     
       // filter of the title
     if (item.title && item.title.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
-      return <Competition competition={item} />;
+      return <Item item={item} onPress={()=>navigation.navigate('Competition', {id: item.id })}/>;
     }
     // filter of the description
     if (item.description && item.description.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
-      return <Competition competition={item} />;
+      return <Item item={item} onPress={()=>navigation.navigate('Competition', {id: item.id })}/>;
+    }
+    
+  };
+  const renderExhibitions = ({ item }) => {
+    
+      // filter of the title
+    if (item.title && item.title.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
+      return <Item item={item} onPress={()=>navigation.navigate('Exhibition', {id: item.id })}/>;
+    }
+    // filter of the description
+    if (item.description && item.description.toUpperCase().includes(searchPhrase.toUpperCase().trim().replace(/\s/g, ""))) {
+      return <Item item={item} onPress={()=>navigation.navigate('Exhibition', {id: item.id })}/>;
     }
     
   };
@@ -80,8 +92,9 @@ const List = ({searchPhrase, setClicked, data, setData}) => {
 
   const renderItem=({item})=>{
     if (pressedSection=='Albums') return renderAlbums({item})
-    if (pressedSection=='Competitions') return renderAlbums({item})
+    if (pressedSection=='Competitions') return renderCompetitions({item})
     if (pressedSection=='Users') return renderUsers({item})
+    if (pressedSection=='Exhibitions') return renderExhibitions({item})
   }
   
   useEffect(()=>{
@@ -99,7 +112,7 @@ const List = ({searchPhrase, setClicked, data, setData}) => {
           setClicked(false);
         }}
       >
-        <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'center', width: '100%', padding:15}}>
+        <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'center', width: '100%'}}>
             <TouchableSection title = 'Users' 
             onPress={async() => {
               setData([])
@@ -125,6 +138,14 @@ const List = ({searchPhrase, setClicked, data, setData}) => {
               setData(response)
             }} 
              pressed = {pressedSection}/>
+             <TouchableSection title = 'Exhibitions'
+             onPress={async() => {
+               setData([])
+               setPressedSection('Exhibitions')
+               let response = await getExhibitions()
+               setData(response)
+             }} 
+              pressed = {pressedSection}/>
           </View>
           
           <FlatList
@@ -142,12 +163,12 @@ export default List;
 
 const styles = StyleSheet.create({
   list__container: {
-    margin: 10,
     height: "85%",
     width: "100%",
   },
   item: {
-    margin: 30,
+    margin: 10,
+    padding:5,
     borderBottomWidth: 2,
     borderBottomColor: "lightgrey"
   },
