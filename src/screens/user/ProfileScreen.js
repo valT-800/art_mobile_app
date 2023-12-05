@@ -1,6 +1,6 @@
 
 import React, { useContext, useEffect, useState } from "react";
-import { Button, SafeAreaView, Text, TouchableHighligh, FlatList, TouchableHighlight, View, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, RefreshControl } from "react-native";
+import { Button, SafeAreaView, Text, TouchableHighligh, FlatList, TouchableHighlight, View, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, RefreshControl, Modal } from "react-native";
 import {api} from "../../services/api_base";
 import { AuthContext } from "../../AuthProvider";
 import * as SecureStore from 'expo-secure-store'
@@ -13,10 +13,13 @@ import {NormalText} from "../../components/AppTextComponents";
 import {OtherText} from "../../components/AppTextComponents";
 import CustomIcon from "../../components/CustomIcon";
 import TouchableSection from "../../components/TouchableSection";
+import { useTheme } from "@react-navigation/native";
+import TouchableListItem from "../../components/TouchableListItem";
+import TouchableText from "../../components/TouchableText";
 
 function ProfileScreen({navigation: {navigate}}){
 
-  const { user, logout } = useContext(AuthContext)
+  const { user} = useContext(AuthContext)
   const[loggedUser, setLoggedUser] = useState([])
   const[albums, setAlbums] = useState([])
   const[posts, setPosts] = useState([])
@@ -25,12 +28,15 @@ function ProfileScreen({navigation: {navigate}}){
   const[pressedSection, setPressedSection]=useState('Created')
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  
+  const {colors} = useTheme()
+  const[visible, setVisible]= useState(false) //sets visibility of down Modal to uppear then '+' icon (new content) is pressed
 
   const onUserRefresh = () => {
     setLoggedUser([])
     getUser()
     setPosts([])  
+    setAlbums([])
+    getAlbums()
     setCurrentPage(1)
     setPressedSection('Created')
     getPostsWithoutAlbum(user.id)
@@ -38,6 +44,22 @@ function ProfileScreen({navigation: {navigate}}){
       setLoadingUser(false);
     }, 1000);
   };
+
+  
+  const getAlbums = async () => {
+    api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+    await api.get(`api/albums/user/${user.id}/?page=${currentPage}`).then(response => {
+      const { data, meta } = response.data;
+      const albumsArray = Object.values(data); 
+      setAlbums((prevAlbums) => [...prevAlbums, ...albumsArray]);
+      //setTotalPages(meta.last_page);
+      //console.log(albumsArray)
+      //setLoading(false);
+    }).catch(error => {
+      console.log("Error", error);
+      //setLoading(false);
+  });
+}
   
   function getPostsWithoutAlbum(user_id){
     api.get(`api/posts/noalbum/user/${user_id}/?page=${currentPage}`)
@@ -103,6 +125,7 @@ function ProfileScreen({navigation: {navigate}}){
         //else if(pressedSection=='Created') getPostsWithoutAlbum(user.id) 
     }
   };
+  
   const getUser=async()=>{
 
     await api.get('api/user')
@@ -116,11 +139,11 @@ function ProfileScreen({navigation: {navigate}}){
   }
   useEffect(() => {
     getUser()
+    getAlbums()
       
   }, []);
   useEffect(() => {
     getPostsWithoutAlbum(user.id);
-      
   }, [currentPage]);
 
     return(
@@ -138,29 +161,30 @@ function ProfileScreen({navigation: {navigate}}){
             <NormalText text={loggedUser.name}/>
             <OtherText text={loggedUser.email}/>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', width: 170}}>
-            <NormalText text = {loggedUser.followers ? (loggedUser.followers.length + " followers"):(0 +" followers")}/>
-            <NormalText text = {loggedUser.following ? (loggedUser.following.length + " following"):(0 +" following")}/>
+            <TouchableText title = {loggedUser.followers + " followers"} onPress={()=>navigate('Followers')}/>
+            <TouchableText title = {loggedUser.following + " following"}  onPress={()=>navigate('FollowingUsers')}/>
             </View>
             <CustomButton title ='Edit profile' onPress={()=>navigate('EditProfile', loggedUser)}></CustomButton>
             
           </View>
           <View style={{flexDirection: 'row', alignSelf: 'center'}}>
-            <CustomIcon name = 'add' size={30} event={()=> {navigate('NewAlbum')}}/>
+            <CustomIcon name = 'add' size={30} event={()=> {setVisible(true)}}/>
           </View>
           <View style = {styles.albums}>
             <FlatList
               keyExtractor = {( item) => item.id }
-              
               contentContainerStyle={{
               flexGrow: 1,
               flexDirection:'row'
               }}
+              scrollEnabled={false}
               horizontal={true}
-              nestedScrollEnabled={true}
-              data={loggedUser.albums}
+              //nestedScrollEnabled={true}
+              data={albums}
               renderItem={({item}) => {
                 return(<Album album={item}></Album>)}}
             ></FlatList>
+            <CustomIcon name='chevron-forward' size={30}/>
           </View>
 
           <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'center', width: '100%', padding:15}}>
@@ -196,12 +220,24 @@ function ProfileScreen({navigation: {navigate}}){
               renderItem={({item}) => {
               return(<ImageComponent post={item}></ImageComponent>)}}
               numColumns={3}
+              scrollEnabled={false}
               keyExtractor = {( item, index) => item.id }
               // onEndReached={handleLoadMore}
               // onEndReachedThreshold={0.1}
             ></FlatList>
             {loadingPosts && <ActivityIndicator/>}
           </View>
+          
+          <Modal animationType="slide" visible={visible} transparent onRequestClose={()=>setVisible(false)}>
+          <View style={[styles.overlayContainer, {backgroundColor: colors.card}]}>
+            <CustomIcon name='chevron-down' size={30} event={()=>setVisible(false)}>
+            </CustomIcon>
+            {/*user.role == 'gallery' && <TouchableListItem title='New competition' onPress={()=>navigate('NewCompetition')}/>*/}
+            {<TouchableListItem title='New competition' onPress={()=>navigate('NewCompetition')}/> /*temp*/} 
+            {<TouchableListItem title='New post' onPress={()=>navigate('NewContent')}/>}
+            {<TouchableListItem title='New album' onPress={()=>navigate('NewAlbum')}/>}
+          </View>
+        </Modal>
           </ScrollView>
         </SafeAreaView>
     )}
@@ -214,11 +250,22 @@ const styles = StyleSheet.create({
     flex: 1
   },
   albums: {
-    alignItems: 'flex-start',
+    flex:1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   posts: {
     justifyContent: 'center',
-    flex: 1,
-    
-  }
+    flex: 1, 
+  },
+  overlayContainer: {
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    width: '100%',
+    bottom: 0,
+    paddingBottom: 20,
+  },
 });
