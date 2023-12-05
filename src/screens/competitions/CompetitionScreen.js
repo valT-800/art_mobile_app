@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import {BoldText, Header} from "../../components/AppTextComponents";
 import {NormalText} from "../../components/AppTextComponents";
 import CustomButton from "../../components/CustomButton";
-import PostComponent from "../../components/Post";
+import ImageComponent from "../../components/Post";
 import getCompetition from "../../utils/getCompetition";
 
 export default function CompetitionScreen({route, navigation:{navigate}}){
@@ -43,7 +43,7 @@ export default function CompetitionScreen({route, navigation:{navigate}}){
             <FlatList
               data={competition.posts}
               renderItem={({item}) => {
-              return(<PostComponent post={item}></PostComponent>)}}
+              return(<ImageComponent post={item}></ImageComponent>)}}
               numColumns={3}
               keyExtractor = {( item, index) => item.id }
             ></FlatList>

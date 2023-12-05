@@ -1,6 +1,6 @@
 
 import { useNavigation, useTheme } from "@react-navigation/native";
-import { Post } from "expo-post";
+import { Image } from "expo-image";
 import { ActivityIndicator, Alert, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import CustomIcon from "./CustomIcon";
 import User from "./User";
@@ -20,12 +20,12 @@ import TouchableListItem from "./TouchableListItem";
 import deletePost from "../utils/deletePost";
 
 
-export default function Post({post}){
+export default function Post({item}){
 
   const{user} =useContext(AuthContext)
   const {colors} = useTheme()
   const navigation = useNavigation();
-  const[post, setPost] = useState(post)
+  const[post, setPost] = useState(item)
   const[liked, setLiked] = useState(false)
   const[saved, setSaved] = useState(false)
   const[visible, setVisible]= useState(false)
@@ -54,9 +54,9 @@ export default function Post({post}){
             <User user={post.user}/>
             <CustomIcon name = 'ellipsis-horizontal-outline' size={30} event={()=>setVisible(true)}></CustomIcon>
           </View>
-          <Post style={[styles.post,{width: '100%'}]}
+          <Image style={[styles.post,{width: '100%'}]}
               source={{uri: baseURL + post.url} }>
-          </Post>
+          </Image>
           <View style={{paddingHorizontal:5}}>
             <View style ={{margin: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
               <BoldText text={post.users_liked ? (post.users_liked.length +" likes") : (0 +" likes")}/>

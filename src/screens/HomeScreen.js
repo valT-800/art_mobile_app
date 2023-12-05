@@ -53,7 +53,7 @@ export default function HomeScreen({navigation}){
       {posts.length > 0 ? (
         <FlatList
           data={posts}
-          renderItem={({ item }) => <Post post={item} />}
+          renderItem={({ item }) => <Post item={item} />}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
           keyExtractor={(item) => item.id.toString()}

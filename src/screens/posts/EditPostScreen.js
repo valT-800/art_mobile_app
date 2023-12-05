@@ -4,7 +4,7 @@ import {api, baseURL} from "../../services/api_base";
 import { AuthContext } from "../../AuthProvider";
 import CustomIcon from "../../components/CustomIcon";
 import User from "../../components/User";
-import { Post } from "expo-post";
+import { Post } from "expo-image";
 import { useTheme } from "@react-navigation/native";
 import editPost from "../../utils/editPost";
 

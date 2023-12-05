@@ -1,4 +1,4 @@
-import * as PostPicker from 'expo-post-picker'
+import * as PostPicker from 'expo-image-picker'
 
 const options = {
     mediaTypes: PostPicker.MediaTypeOptions.All,

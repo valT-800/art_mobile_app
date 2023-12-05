@@ -1,7 +1,7 @@
 
 import React, { useContext, useEffect, useState } from "react";
 import { Button, SafeAreaView, Text, TouchableHighligh, FlatList, TouchableHighlight, View, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from "react-native";
-import { Post } from "expo-post";
+import { Post } from "expo-image";
 import {api} from "../../services/api_base";
 import { AuthContext } from "../../AuthProvider";
 import { Ionicons } from "@expo/vector-icons";

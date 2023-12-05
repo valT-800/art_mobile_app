@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { FlatList, Post, StyleSheet, Text, View } from 'react-native';
-import * as PostPicker from 'expo-post-picker';
+import * as PostPicker from 'expo-image-picker';
 import CustomButton from '../../components/CustomButton';
 import pickPostFromGallery from '../../utils/pickPostFromGallery';
 import takePhoto from '../../utils/takePhoto';
 
-export default function SelectPostScreen ({navigation: {navigate}, route}) {
+export default function SelectImageScreen ({navigation: {navigate}, route}) {
     const{id} = route.params;
     const [post, setPost] = useState(null);
     

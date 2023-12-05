@@ -23,7 +23,7 @@ export default function PostScreen({navigation, route}){
 
     return(
     <SafeAreaView style={styles.container}>
-      {loading ? <ActivityIndicator/> :  <Post post={post}/>}
+      {loading ? <ActivityIndicator/> :  <Post item={post}/>}
        
     </SafeAreaView>
   );

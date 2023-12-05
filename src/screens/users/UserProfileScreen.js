@@ -3,8 +3,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { Button, SafeAreaView, Text, TouchableHighligh, FlatList, TouchableHighlight, View, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
 import { AuthContext } from "../../AuthProvider";
 import Album from "../../components/Album";
-import PostComponent from "../../components/Post";
-import { Post } from "expo-post";
+import ImageComponent from "../../components/Post";
+import { Post } from "expo-image";
 import {NormalText} from "../../components/AppTextComponents";
 import {OtherText} from "../../components/AppTextComponents";
 import { api } from "../../services/api_base";
@@ -119,7 +119,7 @@ function UserProfileScreen({navigation: {navigate}, route}){
             <FlatList
               data={posts}
               renderItem={({item}) => {
-              return(<PostComponent post={item}></PostComponent>)}}
+              return(<ImageComponent post={item}></ImageComponent>)}}
               numColumns={3}
               keyExtractor = {( item, index) => item.id }
             ></FlatList>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Post } from 'expo-post';
+import { Post } from 'expo-image';
 import { api, baseURL } from '../../services/api_base';
 import {NormalText} from '../../components/AppTextComponents';
-import addPostToCompetitions from '../../utils/addPostToCompetitions';
+import AddPostToCompetition from '../../utils/addPostToCompetition';
 
 
 function PickPostFromApp({navigation:{navigate}, route}){
@@ -48,7 +48,7 @@ function PickPostFromApp({navigation:{navigate}, route}){
                 }}>
                 <TouchableOpacity
                 onPress={async()=> {
-                  addPostToCompetitions(item.id, {id})
+                  AddPostToCompetition(item.id, {id})
                   navigate('Competition', {id})}}>
                     <Post style={styles.post}
                         source={baseURL + item.url }></Post>

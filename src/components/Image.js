@@ -1,9 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
-import { Post } from "expo-post";
+import { Image } from "expo-image";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { baseURL } from "../services/api_base";
 
-export default function PostComponent({post}){
+export default function ImageComponent({post}){
 
   const navigation = useNavigation();
 
@@ -16,10 +16,10 @@ export default function PostComponent({post}){
       }}>
       <TouchableOpacity
        onPress={()=> navigation.navigate('Post', {id: post.id})}>
-          <Post style={styles.post}
+          <Image style={styles.image}
               source={baseURL + post.url }
               >
-          </Post>
+          </Image>
           
       </TouchableOpacity>
       </View>
@@ -29,7 +29,7 @@ export default function PostComponent({post}){
 
 const styles = StyleSheet.create({
     
-    post:{
+    image:{
       height: 150,
       justifyContent: 'center',
       alignItems: 'center',

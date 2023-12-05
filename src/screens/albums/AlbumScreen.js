@@ -3,7 +3,7 @@ import { createContext, useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AuthContext } from "../../AuthProvider";
 import {api} from "../../services/api_base";
-import PostComponent from "../../components/Post";
+import ImageComponent from "../../components/Post";
 import {BoldText} from "../../components/AppTextComponents";
 import {NormalText} from "../../components/AppTextComponents";
 import getAlbum from "../../utils/getAlbum";
@@ -48,7 +48,7 @@ export default function AlbumScreen({route, navigation:{navigate}}){
             <FlatList
               data={album.posts}
               renderItem={({item}) => {
-              return(<PostComponent post={item}></PostComponent>)}}
+              return(<ImageComponent post={item}></ImageComponent>)}}
               numColumns={3}
               keyExtractor = {( item, index) => item.id }
             ></FlatList>
