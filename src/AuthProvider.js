@@ -33,6 +33,7 @@ export const AuthProvider = ({children}) => {
                   name: data.name,
                   username: data.username,
                   token: data.token,
+                  roles: data.roles,
                 }
                 setUser(userResponse);
                 setError(null);
@@ -43,9 +44,9 @@ export const AuthProvider = ({children}) => {
               setError(error.response.data);
             })
         },
-        login: (email, password) => {
+        login: (email_or_username, password) => {
           api.post('api/login', {
-            email,
+            email_or_username: email_or_username,
             password,
           })
           .then(response => {
@@ -57,6 +58,7 @@ export const AuthProvider = ({children}) => {
               name: data.name,
               username: data.username,
               token: data.token,
+              roles: data.roles,
             }
             //console.log("User response ", userResponse.token);
             
@@ -94,6 +96,7 @@ export const AuthProvider = ({children}) => {
               name: data.name,
               username: data.username,
               token: data.token,
+              roles: data.roles,
             }
             //console.log("User response ", userResponse.token);
             
@@ -103,7 +106,7 @@ export const AuthProvider = ({children}) => {
             SecureStore.setItemAsync('user', JSON.stringify(userResponse));
           })
           .catch(error => {
-            //console.log('Update error:', error.response.data);
+            console.log('Update error:', error.response.data);
             setError(error.response.data);
           })
         }

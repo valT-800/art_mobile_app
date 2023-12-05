@@ -14,22 +14,20 @@ const Tab = createBottomTabNavigator();
 
 function LoginScreen({ navigation: {navigate} }) {
   const { login, error } = useContext(AuthContext);
-  const [email, setEmail] = useState('');
+  const [email_or_username, setEmailUsername] = useState('');
   const [password, setPassword] = useState('');    
   const[appError, setError]=useState('')
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       { error &&
-        <Text style={{ color: 'red', marginBottom: 24 }}>{error.data.error} - {error.message }</Text>
+        <Text style={{ color: 'red', marginBottom: 24 }}>{error.message} - {error.data }</Text>
       }
       {appError && <Text style={{ color: 'red', marginBottom: 24 }}>{ appError }</Text>}
-      <NormalText text='Email address'/>
+      <NormalText text='Email address/Username'/>
       <CustomInput
         style={{  marginBottom:24 }}
-        onChangeText={text => setEmail(text)}
-        placeholder="Email"
-        textContentType="emailAddress"
-        keyboardType='email-address'
+        onChangeText={text => setEmailUsername(text)}
+        placeholder="Email or username"
         autoCapitalize = 'none'
       />
       <NormalText text='Password'/>
@@ -40,9 +38,9 @@ function LoginScreen({ navigation: {navigate} }) {
         secureTextEntry={true}
       />
       <CustomButton title="Login" onPress={() => {
-        if(!email.trim()) setError('Please provide email')
+        if(!email_or_username.trim()) setError('Please provide email or username')
         else if(!password.trim()) setError('Please provide password')
-        else {login(email, password)}}}/>
+        else {login(email_or_username, password)}}}/>
       <TouchableOpacity onPress={() => navigate('Register')}>
                 <NormalText text='No account? Sign up' />
             </TouchableOpacity>
@@ -61,17 +59,21 @@ const { register, error } = useContext(AuthContext);
   const[appError, setError]=useState('')
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Register Screen</Text>
-      { error &&
-        <Text style={{ color: 'red', marginBottom: 24 }}>{error.data.error} - {error.message }</Text>
-      }
+
       {appError && <Text style={{ color: 'red', marginBottom: 24 }}>{ appError }</Text>}
+      
+      { error && error.data.name &&
+      <Text style={{ color: 'red', marginBottom: 24 }}>{error.data.name}</Text>
+      }
       <CustomInput
         style={{  marginBottom: 24 }}
         onChangeText={text => setName(text)}
         placeholder="Name"
         textContentType='name'
       />
+      { error && error.data.username &&
+      <Text style={{ color: 'red', marginBottom: 24 }}>{error.data.username}</Text>
+      }
       <CustomInput
       style={{ marginBottom: 24  }}
       onChangeText={text => setUsername(text)}
@@ -79,6 +81,9 @@ const { register, error } = useContext(AuthContext);
       textContentType='nickname'
       autoCapitalize = 'none'
       />
+      { error && error.data.email &&
+      <Text style={{ color: 'red', marginBottom: 24 }}>{error.data.email}</Text>
+      }
       <CustomInput
         style={{  marginBottom: 24  }}
         onChangeText={text => setEmail(text)}
@@ -87,12 +92,18 @@ const { register, error } = useContext(AuthContext);
         keyboardType='email-address'
         autoCapitalize = 'none'
       />
+      { error && error.data.password &&
+      <Text style={{ color: 'red', marginBottom: 24 }}>{error.data.password}</Text>
+      }
       <CustomInput
         style={{  marginBottom: 24 }}
         onChangeText={text => setPassword(text)}
         placeholder="Password"
         secureTextEntry={true}
       />
+      { error && error.data.confirmation_password &&
+      <Text style={{ color: 'red', marginBottom: 24 }}>{error.data.confirmation_password}</Text>
+      }
       <CustomInput
         style={{ marginBottom: 24 }}
         onChangeText={text => setConfirmedPassword(text)}
