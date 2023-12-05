@@ -1,14 +1,11 @@
 import { api } from "../services/api_base";
 
-export default async function getUserAlbums(){
-    let result = await api.get('api/user/albums').then(response => {
-    let apidata = response.data;
-    if (apidata.length !== 0) {
-    return apidata.data;
-    }    
+export default async function getUserAlbums(id,currentPage){
+  console.log(id,currentPage)
+  await api.get(`api/albums/user/${id}/?page=${currentPage}`).then(response => {
+    console.log(response.data)
+    return(response.data)
   }).catch(error => {
-    //console.log(error);
-  });
-
-  return result
+    console.log("Error", error);
+});
 }

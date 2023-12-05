@@ -1,5 +1,4 @@
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import {api} from "../../services/api_base";
+import { SafeAreaView, StyleSheet, View } from "react-native";
 import { useState } from "react";
 import {NormalText} from "../../components/AppTextComponents";
 import CustomInput from "../../components/CustomInput";
