@@ -5,7 +5,7 @@ import CustomButton from '../../components/CustomButton';
 import pickPostFromGallery from '../../utils/pickPostFromGallery';
 import takePhoto from '../../utils/takePhoto';
 
-export default function SelectImageScreen ({navigation: {navigate}, route}) {
+export default function NewContentScreen ({navigation: {navigate}, route}) {
     const{id} = route.params;
     const [post, setPost] = useState(null);
     
