@@ -4,7 +4,7 @@ import { AuthContext } from "../AuthProvider";
 
   
 export default async function uploadPost(post, description, album_id, competition_id, {tags}){
-
+    const{user}=useContext(AuthContext)
     //console.log(tags)
     let filename = post.toString();
     let match = /\.(\w+)$/.exec(filename);
@@ -19,6 +19,7 @@ export default async function uploadPost(post, description, album_id, competitio
             //console.log(JSON.stringify(item))
           formData.append(`tags[${index}]`, item);
         });}
+    api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
     let result = await api.post('api/user/posts', formData, 
     {headers: { 'Content-Type': 'multipart/form-data',}})
     .then((response) => {

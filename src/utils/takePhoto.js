@@ -1,13 +1,13 @@
-import * as PostPicker from 'expo-image-picker'
+import * as ImagePicker from 'expo-image-picker'
 
 const options = {
-    mediaTypes: PostPicker.MediaTypeOptions.All,
+    mediaTypes: ImagePicker.MediaTypeOptions.All,
     allowsEditing: true,
     aspect: [3, 4],
     quality: 0.7,
 };
 export default takePhoto = async () => {
-    let result = await PostPicker.launchCameraAsync(options);
+    let result = await ImagePicker.launchCameraAsync(options);
     //console.log(result);
     if (!result.canceled) {
         return result.assets[0].uri
