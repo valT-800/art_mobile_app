@@ -1,45 +1,85 @@
-import { useNavigation } from "@react-navigation/native";
-import { FlatList, SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
-import getCompetitions from "../../utils/getCompetitions";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { ActivityIndicator, RefreshControl, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList } from "react-native";
+import { api } from "../../services/api_base";
+import { AuthContext } from "../../AuthProvider";
 import Competition from "../../components/Competition";
 
-export default function CompetitionsScreen({route, navigation:{navigate}}){
-  
+export default function CompetitionsScreen({navigation}){
+  const{user} = useContext(AuthContext)
   const [competitions, setCompetitions] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    async function fetchData(){
-      let result = await getCompetitions(id)
-      setCompetitions(result)
-      setLoading(false)
+  const onRefresh = () => {
+    setCompetitions([])
+    setCurrentPage(1)
+    fetchCompetitions()
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
+
+   const fetchCompetitions = async () => {
+        
+        api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+        await api.get(`api/competitions/?page=${currentPage}`).then(response => {
+          const { data, meta } = response.data;
+          const competitionsArray = Object.values(data); 
+          setCompetitions((prevCompetitions) => [...prevCompetitions, ...competitionsArray]);
+          setTotalPages(meta.last_page);
+          console.log(competitionsArray)
+          setLoading(false);
+        }).catch(error => {
+          //console.log("Error", error);
+          setLoading(false);
+      });
     }
-    fetchData()
-  }, []);
-  return(
+  useEffect(() => {
+    fetchCompetitions()
+
+  }, [currentPage]);
+
+  const handleLoadMore = () => {
+    if (currentPage < totalPages) {
+      //console.log(currentPage)
+      setLoading(true)
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+    return(
     <SafeAreaView style={styles.container}>
-      {loading ? <ActivityIndicator/> : 
-        <View style={styles.competitions}>
-            <FlatList
-              data={competitions}
-              renderItem={({item}) => {
-              return(<Competition post={item}></Competition>)}}
-              numColumns={3}
-              keyExtractor = {( item, index) => item.id }
-            ></FlatList>
-          </View>}
+      {competitions.length > 0 ? (
+        <FlatList
+          data={competitions}
+          numColumns={3}
+          renderItem={({ item }) => <Competition competition={item} />}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.1}
+          key={`competitionsList-3`}
+          contentContainerStyle={styles.competitions}
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={onRefresh} />
+          }
+        />
+      ) : (
+        <ActivityIndicator />
+      )}
+      {loading && <ActivityIndicator/>}
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container:{
-    paddingVertical:20,
-    flex: 1,
-    justifyContent: 'center'
+    flex:1,
+    justifyContent: 'center',
+    marginTop: 65,
   },
-  competitions: {
-    flex: 1,
-    justifyContent: 'center'
+  competitions:{
+    justifyContent: 'space-around',
+    alignItems:'center'
+    
   }
 });
