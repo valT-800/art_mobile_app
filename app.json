@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "art_mobile_app",
+    "name": "ART",
     "slug": "art_mobile_app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/my_icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
