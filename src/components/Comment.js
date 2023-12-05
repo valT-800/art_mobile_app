@@ -37,15 +37,15 @@ export default function Comment({item, setParent, setContent}){
                   {comment.comments && <OtherText text={"Comments "+comment.comments.length}/>}
                 </View>
                 <View style = {{flexDirection: 'row'}}>
-                {liked ? <CustomIcon name='heart' size={15} event={async ()=>{
+                {liked ? <CustomIcon name='heart' size={20} event={async ()=>{
                   let result = await unlikeComment(comment.id)
                   //console.log(result)
                   setComment(result)
                   setLiked(false)
                   }}/>
-              : <CustomIcon name='heart-outline' size={15} event={async ()=>{
+              : <CustomIcon name='heart-outline' size={20} event={async ()=>{
                 let result = await likeComment(comment.id)
-                console.log(result)
+                //console.log(result)
                 setComment(result)
                 setLiked(true)
                 }}/>}

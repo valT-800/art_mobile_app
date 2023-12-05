@@ -26,8 +26,16 @@ export function BoldText({text}) {
         <Text style={[styles.boldText,{ color: colors.text }]}>{text}</Text>
     );
 }
+export function MultilineText({text}) {
+    
+    const { colors } = useTheme();
 
-export function Header({text}) {
+    return (
+        <Text multiline={true} style={[styles.multiline,{ color: colors.text }]}>{text}</Text>
+    );
+}
+
+export function CustomHeader({text}) {
     
 const { colors } = useTheme();
 
@@ -35,6 +43,14 @@ const { colors } = useTheme();
         <Text style={[styles.header,{ color:colors.text }]}>{text}</Text>
     );
 }
+export function CustomHeader2({text}) {
+    
+    const { colors } = useTheme();
+    
+        return (
+            <Text style={[styles.header2,{ color:colors.text }]}>{text}</Text>
+        );
+    }
 const styles = StyleSheet.create({
     text:{
         fontSize:15,
@@ -48,10 +64,20 @@ const styles = StyleSheet.create({
         padding: 1,
         fontWeight: '600'
     },
+    multiline:{
+        fontSize:20,
+        padding:3,
+    },
     header: {
         fontSize:35,
         marginTop:20,
         paddingBottom:10,
+        fontWeight:400
+    },
+    header2: {
+        fontSize:20,
+        marginTop:10,
+        paddingBottom:5,
         fontWeight:400
     }
 })

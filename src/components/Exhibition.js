@@ -3,7 +3,7 @@ import { useState } from "react";
 import {  Post, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { baseURL } from "../services/api_base";
 
-export default function Competition({competition}){
+export default function Exhibition({exhibition}){
 
   const navigation = useNavigation();
   const[url, setUrl] = useState('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6MZSGFFo2KYnkE9K23hpeloGmGBEe1L_yYA&usqp=CAU')
@@ -12,8 +12,8 @@ export default function Competition({competition}){
   const firstPostUrl  = () => {
 
     //console.log(album.posts)
-    if(competition.posts.length > 0){
-      let post = competition.posts.shift()
+    if(exhibition.posts.length > 0){
+      let post = exhibition.posts.shift()
       //console.log(post.url)
       setUrl(baseURL+post.url) 
     }
@@ -22,11 +22,11 @@ export default function Competition({competition}){
     return(
       <View style={styles.container}>
       {firstPostUrl()}
-      <TouchableOpacity onPress={()=> navigation.navigate('Competition', {id: competition.id})}>
+      <TouchableOpacity onPress={()=> navigation.navigate('Exhibition', {id: exhibition.id})}>
           <ImageBackground source={{uri: url}}
           imageStyle={{borderRadius: 10}}
         style={styles.image}>
-          <Text style = {styles.title}>{competition.title}</Text> 
+          <Text style = {styles.title}>{exhibition.title}</Text> 
       </ImageBackground>
       </TouchableOpacity>
     </View>

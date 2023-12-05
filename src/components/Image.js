@@ -11,7 +11,6 @@ export default function ImageComponent({post}){
     return(
       <View style={{
         flex: 1,
-        flexDirection: 'column',
         margin: 1
       }}>
       <TouchableOpacity
@@ -30,10 +29,10 @@ export default function ImageComponent({post}){
 const styles = StyleSheet.create({
     
     image:{
-      height: 150,
+      minHeight:150,
       justifyContent: 'center',
       alignItems: 'center',
-      
+      borderRadius: 10,
     }
   });
   

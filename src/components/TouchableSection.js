@@ -4,9 +4,9 @@ import {TouchableHighlight, TouchableOpacity, View} from "react-native";
 import {NormalText} from "./AppTextComponents";
 
 const TouchableSection=({title, onPress, pressed})=>{
-    const colors = useTheme()
+    const {colors} = useTheme()
     return(
-        <View>
+        <View style={{marginRight: 10}}>
             <TouchableOpacity onPress = {onPress}>
                 <NormalText text={title}/>      
             </TouchableOpacity>

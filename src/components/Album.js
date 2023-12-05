@@ -21,11 +21,10 @@ export default function Album({album}){
 
     return(
     <View style={styles.container}>
-      {firstPostUrl()}
       <TouchableOpacity onPress={()=> navigation.navigate('Album', {id: album.id})}>
         <ImageBackground source={{uri: url}}
         style={styles.image}
-        postStyle = {{borderRadius: 15}}>
+        imageStyle = {{borderRadius: 15}}>
         
           <Text style = {styles.title}>{album.title}</Text>
         
@@ -38,21 +37,19 @@ export default function Album({album}){
 const styles = StyleSheet.create({
   container:{
     margin:5,
-    height: 100,
-    width: 100,
-    shadowColor:'gray'
+    justifyContent:'center',
+    alignItems:'center',
   },
   image:{
     height: 100,
     width: 100,
-    shadowColor: 'gray',
-    shadowRadius: 10,
     justifyContent: 'center',
-    alignItems:'center',
-    elevation: 10
+    alignItems:'center'
   },
   title:{
     color:'white',
-    fontWeight: 500
+    fontWeight: 500,
+    textShadowColor: 'black',
+    textShadowRadius: 20,
   }
 });

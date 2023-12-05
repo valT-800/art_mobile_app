@@ -61,27 +61,26 @@ export default function Post({item}){
             <View style ={{margin: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
               <BoldText text={post.users_liked ? (post.users_liked.length +" likes") : (0 +" likes")}/>
               <View style ={{flexDirection: 'row'}}>
-              {liked ? (
+              {liked ? 
                 <CustomIcon name='heart' size={30} event={async()=>{
                   let result = await unlikePost(post.id)
                   setPost(result)
-                  setLiked(false)}}/>
-              ) :(
+                  setLiked(false)}}/> :
               <CustomIcon name='heart-outline' size={30} event={async()=>{
                 let result = await likePost(post.id)
                 setPost(result)
                 setLiked(true)}}/>
-                )}
+                }
               <CustomIcon name='chatbubbles-outline' event={()=>navigation.navigate('Comments', {post_id: post.id})} size={30}/>
               {/* <CustomIcon name='arrow-redo-outline' size={30}/> */}
-              {saved ? (<CustomIcon name='bookmark' size={30} event={async()=>{
+              {saved ? <CustomIcon name='bookmark' size={30} event={async()=>{
                   let result = await unsavePost(post.id)
                   setPost(result)
-                  setSaved(false)}}/>):
-              (<CustomIcon name='bookmark-outline' size={30} event={async()=>{
+                  setSaved(false)}}/> :
+              <CustomIcon name='bookmark-outline' size={30} event={async()=>{
                 let result = await savePost(post.id)
                 setPost(result)
-                setSaved(true)}}/>)}
+                setSaved(true)}}/>}
               </View>
             </View>
             {post.description && <NormalText text={post.description}/>}
@@ -142,6 +141,7 @@ const styles = StyleSheet.create({
       justifyContent: 'flex-start',
       width: '100%',
       bottom: 0,
+      paddingBottom: 20,
     },
   });
   
