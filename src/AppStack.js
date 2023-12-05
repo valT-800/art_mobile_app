@@ -1,39 +1,49 @@
 
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext} from "react";
 import { AuthContext } from "./AuthProvider";
-import { Button, Text, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "./screens/HomeScreen";
 import NewPostScreen from "./screens/posts/NewPostScreen";
 import GlobalScreen from "./screens/GlobalScreen";
-import SelectImageScreen from "./screens/posts/SelectImageScreen";
+import NewContentScreen from "./screens/posts/NewContentScreen";
 import ProfileScreen from "./screens/user/ProfileScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import NewAlbumScreen from "./screens/albums/NewAlbumScreen";
-import AlbumsScreen from "./screens/albums/AlbumsScreen";
 import AlbumScreen from "./screens/albums/AlbumScreen";
-import CompetitionsScreen from "./screens/competitions/CompetitionsScreen";
 import CompetitionScreen from "./screens/competitions/CompetitionScreen";
+import ExhibitionScreen from "./screens/exhibitions/ExhibitionScreen";
 import CommentsScreen from "./screens/comments/CommentsScreen";
 import { useTheme } from "@react-navigation/native";
 import CustomIcon from "./components/CustomIcon";
 import EditProfileScreen from "./screens/user/EditProfileScreen";
 import PostScreen from "./screens/posts/PostScreen";
 import EditPostScreen from "./screens/posts/EditPostScreen";
-import {BoldText, NormalText} from "./components/AppTextComponents";
+import { CustomHeader2} from "./components/AppTextComponents";
 import UserProfileScreen from "./screens/users/UserProfileScreen";
 import EditAlbumScreen from "./screens/albums/EditAlbumScreen";
 import AddPostToCompetition from "./screens/posts/AddPostToCompetition";
 import PickPostFromApp from "./screens/posts/PickPostFromApp";
+import NewCompetitionScreen from "./screens/competitions/NewCompetitionScreen";
+import NewExhibitionScreen from "./screens/exhibitions/NewExhibitionScreen";
+import FollowingUsersScreen from "./screens/users/FollowingUsersScreen";
+import FollowersScreen from "./screens/users/FollowersScreen";
+import GalleryProfileScreen from "./screens/gallery/ProfileScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+const Header =()=>{
+  const{user} = useContext(AuthContext);
+  return(
+    <View style={{paddingHorizontal: 10}}><CustomHeader2 text={user.username}/></View>
+  )
+}
 function BottomTabContainer ({navigation: {navigate}}) {
   
+  const{user} = useContext(AuthContext);
   const colors = useTheme()
-  const{user, logout, error} = useContext(AuthContext);
   const ProfileHeader =()=>{
     return (
       <View style={{flexDirection: 'row'}}>
@@ -41,6 +51,7 @@ function BottomTabContainer ({navigation: {navigate}}) {
       </View>
     )
   }
+
   return(
     <Tab.Navigator
     screenOptions={({ route }) => ({
@@ -52,7 +63,7 @@ function BottomTabContainer ({navigation: {navigate}}) {
           iconName = focused ? 'home' : 'home-outline';
         } else if (route.name === 'Global') {
           iconName = focused ? 'search' : 'search-outline';
-        } else if (route.name === 'SelectImage') {
+        } else if (route.name === 'NewContent') {
           iconName = focused ? 'add-circle' : 'add';
         } else if (route.name === 'Profile') {
           iconName = focused ? 'person' : 'person-outline';
@@ -62,12 +73,12 @@ function BottomTabContainer ({navigation: {navigate}}) {
       },
       tabBarActiveTintColor: colors.primary,
       tabBarInactiveTintColor: 'gray',
-      tabBarStyle: {paddingTop: 10, height: 60}
+      tabBarStyle: styles.tabBar
     })}>
-      <Tab.Screen name = "Home" component={HomeScreen} options = {{ headerLeft: ()=> <View style={{paddingHorizontal: 10}}><BoldText text={user.username}/></View>}}/>
+      <Tab.Screen name = "Home" component={HomeScreen} options = {{ headerLeft: ()=> <Header/>}}/>
       <Tab.Screen name = "Global" component={GlobalScreen} options = {{headerShown: false}}/>
-      <Tab.Screen name = "SelectImage" component={SelectImageScreen} options = {{headerShown: false}}/>
-      <Tab.Screen name = "Profile" component={ProfileScreen} options = {{headerLeft: ()=> <View style={{paddingHorizontal: 10}}><BoldText text={user.username}/></View>, headerRight: () => <ProfileHeader/>}}/>
+      <Tab.Screen name = "NewContent" component={NewContentScreen} options = {{headerShown: false}}/>
+      {user.roles.some((role) => role.name === 'gallery') ? <Tab.Screen name = "Profile" component={GalleryProfileScreen} options={{headerLeft: ()=> <Header/>, headerRight: () => <ProfileHeader/>}}/> : <Tab.Screen name = "Profile" component={ProfileScreen} options = {{headerLeft: ()=> <Header/>, headerRight: () => <ProfileHeader/>}}/>}
     </Tab.Navigator>
   )
 }
@@ -80,18 +91,27 @@ export function AppStack () {
         <Stack.Screen name = "NewPost" component={NewPostScreen} options = {{title: 'New post'}}/>
         <Stack.Screen name = 'Settings' component={SettingsScreen}/> 
         <Stack.Screen name = "NewAlbum" component={NewAlbumScreen} options = {{title: 'New album'}}/>
-        <Stack.Screen name =  'Albums' component={AlbumsScreen} options = {{title: '',headerTransparent: true, headerStyle: { backgroundColor: 'transparent'}}}/>
-        <Stack.Screen name =  'Album' component={AlbumScreen} options = {{title: '', headerTransparent: true}}/>
-        <Stack.Screen name =  'Competitions' component={CompetitionsScreen} options = {{title: '', headerTransparent: true}}/>
+        <Stack.Screen name =  'Album' component={AlbumScreen} options = {{title: ''}}/>
+        <Stack.Screen name = "NewCompetition" component={NewCompetitionScreen} options = {{title: 'New competition'}}/>
         <Stack.Screen name =  'Competition' component={CompetitionScreen} options = {{title: '', headerTransparent: true}}/>
-        <Stack.Screen name =  'Comments' component={CommentsScreen} options = {{title: 'Comments', headerTintColor: 'white'}}/>
+        <Stack.Screen name = "NewExhibition" component={NewExhibitionScreen} options = {{title: 'New exhibition'}}/>
+        <Stack.Screen name =  'Exhibition' component={ExhibitionScreen} options = {{title: '', headerTransparent: true}}/>
+        <Stack.Screen name =  'Comments' component={CommentsScreen} options = {{title: 'Comments'}}/>
         <Stack.Screen name = 'EditProfile' component={EditProfileScreen} options={{title: 'Edit Profile'}}/>
         <Stack.Screen name = 'Post' component={PostScreen} options = {{title: '', headerTransparent: true}}/>
         <Stack.Screen name = 'EditPost' component={EditPostScreen} options={{title: 'Edit info'}}/>
         <Stack.Screen name = 'EditAlbum' component={EditAlbumScreen} options={{title: 'Edit info'}}/>
-        <Stack.Screen name = 'User' component = {UserProfileScreen} options = {{title: '', headerTransparent: true}}/>
+        <Stack.Screen name = 'User' component = {UserProfileScreen} options = {{title: ''}}/>
+        <Stack.Screen name =  'FollowingUsers' component={FollowingUsersScreen} options = {{title: 'Following'}}/>
+        <Stack.Screen name =  'Followers' component={FollowersScreen} options = {{title: 'Followers'}}/>
         <Stack.Screen name = 'AddToCompetition' component={AddPostToCompetition} options = {{title: '', headerTransparent: true}}/>
         <Stack.Screen name = 'PickPostFromApp' component={PickPostFromApp} options = {{title: '', headerTransparent: true}}/>
       </Stack.Navigator>
   )
 }
+const styles = StyleSheet.create({
+  tabBar: {
+    height: Platform.OS === 'ios' ? 70 : 60,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 0
+  }
+})
