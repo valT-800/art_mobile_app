@@ -9,33 +9,38 @@ import {NormalText} from "../../components/AppTextComponents";
 import {OtherText} from "../../components/AppTextComponents";
 import { api } from "../../services/api_base";
 import CustomButton from "../../components/CustomButton";
+import Competition from "../../components/Competition";
+import Exhibition from "../../components/Exhibition";
 import unfollowUser from "../../utils/unfollowUser";
 import followUser from "../../utils/followUser";
-import getUserAlbums from "../../utils/getUserAlbums";
 import TouchableSection from "../../components/TouchableSection";
-function UserProfileScreen({navigation: {navigate,setOptions}, route}){
+import Divider from "../../components/Divider";
+function UserProfileScreen({navigation: {setOptions}, route}){
 
   const {user} = useContext(AuthContext)
-  const[otherUser, setOtherUser] = useState({})
+  const[otherUser, setOtherUser] = useState([])
   const[posts, setPosts] = useState([])
   const[albums, setAlbums] = useState([])
+  const[competitions, setCompetitions] = useState([])
+  const[exhibitions, setExhibitions] = useState([])
   const[loading, setLoading] = useState(true)
   const[loadingUser, setLoadingUser] = useState(true)
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const[pressedSection, setPressedSection]=useState('Posts')
-
+  const[following, setFollowing] = useState(true);
   const{id} =route.params;
 
-  setOptions({
-    title:otherUser.username
-  })
+  
   const onUserRefresh = () => {
     setLoadingUser(true)
     setLoading(true)
     setPosts([])
+    setCompetitions([])
+    setExhibitions([])
     setAlbums([])
     setCurrentPage(1)
+    fetchData()
     setTimeout(() => {
       setLoadingUser(false);
       setLoading(false)
@@ -48,13 +53,41 @@ function UserProfileScreen({navigation: {navigate,setOptions}, route}){
       setAlbums((prevAlbums) => [...prevAlbums, ...albumsArray]);
       console.log(albums)
       setTotalPages(meta.last_page);
+      setLoading(false);
     }).catch(error => {
       console.log("Error", error);
+      setLoading(false);
   });  
-  setLoading(false);
   }
-  function getPostsWithoutAlbum(id){
-    api.get(`api/posts/noalbum/user/${id}/?page=${currentPage}`)
+  const getCompetitions = async () => {
+    await api.get(`api/published-competitions/user/${id}/?page=${currentPage}`).then(response => {
+      const { data, meta } = response.data;
+      const competitionsArray = Object.values(data); 
+      setCompetitions((prevCompetitions) => [...prevCompetitions, ...competitionsArray]);
+      console.log(competitions)
+      setTotalPages(meta.last_page);
+      setLoading(false);
+    }).catch(error => {
+      console.log("Error", error);
+      setLoading(false);
+  });  
+  }
+  const getExhibitions = async () => {
+    await api.get(`api/published-exhibitions/user/${id}/?page=${currentPage}`).then(response => {
+      const { data, meta } = response.data;
+      const exhibitionsArray = Object.values(data); 
+      setExhibitions((prevExhibitions) => [...prevExhibitions, ...exhibitionsArray]);
+      console.log(exhibitions)
+      setTotalPages(meta.last_page);
+      setLoading(false);
+    }).catch(error => {
+      console.log("Error", error);
+      setLoading(false);
+  });  
+  }
+  
+  async function getPosts(){
+    await api.get(`api/posts/user/${id}/?page=${currentPage}`)
       .then(response => {
         const { data, meta } = response.data;
         setPosts((prevPosts) => [...prevPosts, ...data]);
@@ -69,10 +102,9 @@ function UserProfileScreen({navigation: {navigate,setOptions}, route}){
   
   
   async function isFollowing(){
-    await api.get(`api/user/is-following/user/${otherUser.id}`).then(response => {
+    await api.get(`api/user/is-following/user/${id}`).then(response => {
       console.log('Is following',response.data.isFollowing)
-      if(response.data.isFollowing.toString()=="true"){return true}
-      else {return false}
+      setFollowing(response.data.isFollowing)
   }).catch(error => {
     console.log(error.response);
   })}
@@ -89,10 +121,8 @@ function UserProfileScreen({navigation: {navigate,setOptions}, route}){
   const getUser = async()=>{
     await api.get(`api/users/${id}`)
       .then(response => {
-        
         //console.log("Other user ", response.data.data)
         setOtherUser(response.data.data);
-        
         setLoadingUser(false)
       }
       )
@@ -103,11 +133,20 @@ function UserProfileScreen({navigation: {navigate,setOptions}, route}){
   }
   useEffect(() => {
     getUser()
+    isFollowing()
+    setOptions({
+      title: otherUser ? otherUser.username : ''
+    })
   }, [loadingUser]);
-  
-  useEffect(()=>{
-    if(pressedSection=='Posts') getPostsWithoutAlbum(id);
+
+  fetchData = () => {
+    if(pressedSection=='Posts') getPosts();
     else if(pressedSection=='Albums') getAlbums();
+    else if(pressedSection=='Competitions') getCompetitions();
+    else getExhibitions();
+  }
+  useEffect(()=>{
+    fetchData()
   }, [currentPage])
   
   return(
@@ -128,46 +167,56 @@ function UserProfileScreen({navigation: {navigate,setOptions}, route}){
             <NormalText text = {otherUser.followers + " followers"}/>
             <NormalText text = {otherUser.following  + " following"}/>
             </View>
-            {isFollowing() ? (<CustomButton title ='unfollow' onPress={async()=>{
+            {following ? (<CustomButton title ='unfollow'
+            onPress={async()=>{
+              await unfollowUser(id)
               setLoadingUser(true)
-              await unfollowUser(id)}}/>) : (<CustomButton title ='follow' onPress={async()=>{
+            }}/>) :
+            (<CustomButton title ='follow'
+            onPress={async()=>{
+              await followUser(id)
                 setLoadingUser(true)
-                await followUser(id)}}/>)}
+                }}/>)}
           </View>
           <View style={{flex: 1}}>
-            <View style = {{margin: 5, flexDirection:'row',justifyContent:'space-evenly'}}>
-              <TouchableSection title = 'Posts'
+              <Divider/>
+            <View style = {{margin: 5, flexDirection:'row',justifyContent:'space-evenly',flexWrap:'wrap'}}>
+            {otherUser.roles && otherUser.roles.some(r=>r.name=='user') && <TouchableSection title = 'Posts'
+              pressedSection = 'Posts'
                   onPress={() => {
                   setPosts([])
-                  setPressedSection('Posts')
                   setCurrentPage(1)
-                  getPostsWithoutAlbum(id)
+                  setPressedSection('Posts')
+                  getPosts(id)
                   }}
-                  pressed = {pressedSection}/>    
-              <TouchableSection title = 'Albums'
+                  pressed = {pressedSection}/> }   
+              {otherUser.roles && otherUser.roles.some(r=>r.name=='user') && <TouchableSection title = 'Albums'
+              pressedSection = 'Albums'
                   onPress={() => {
                   setAlbums([])
                   setPressedSection('Albums')
                   setCurrentPage(1)
                   getAlbums()
                   }}
-                  pressed = {pressedSection}/>
+                  pressed = {pressedSection}/>}
                   {otherUser.roles && otherUser.roles.some(r=>r.name=='gallery') && 
               <TouchableSection title = 'Competitions'
+              pressedSection = 'Competitions'
                   onPress={() => {
-                  setPosts([])
+                  setCompetitions([])
                   setPressedSection('Competitions')
                   setCurrentPage(1)
-                  getPostsWithoutAlbum(id)
+                  getCompetitions()
                   }}
                   pressed = {pressedSection}/>}
                   {otherUser.roles && otherUser.roles.some(r=>r.name=='gallery') &&
               <TouchableSection title = 'Exhibitions'
+              pressedSection = 'Exhibitions'
                   onPress={() => {
-                  setAlbums([])
+                  setExhibitions([])
                   setPressedSection('Exhibitions')
                   setCurrentPage(1)
-                  getAlbums()
+                  getExhibitions()
                   }}
                   pressed = {pressedSection}/>}
                   
@@ -175,13 +224,13 @@ function UserProfileScreen({navigation: {navigate,setOptions}, route}){
           </View>
           {pressedSection=='Albums' && 
           <FlatList 
-            numColumns={3} 
+            numColumns={2} 
             scrollEnabled={false}
-            key={`albumsList-3`}
-            contentContainerStyle={styles.albums}
+            key={`albumsList-2`}
+            contentContainerStyle={styles.items}
             data={albums}
             renderItem={({item}) => {
-              return(<Album album={item}></Album>)}}
+              return(<Album album={item} size={150}></Album>)}}
           ></FlatList>}
 
           {pressedSection=='Posts' && 
@@ -195,6 +244,30 @@ function UserProfileScreen({navigation: {navigate,setOptions}, route}){
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.1}
             key={`postsList-3`}
+          ></FlatList>}
+          {pressedSection=='Competitions' && 
+          <FlatList
+            data={competitions}
+            contentContainerStyle={styles.items}
+            renderItem={({item}) => {
+            return(<Competition competition={item}></Competition>)}}
+            numColumns={3}
+            scrollEnabled={false}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.1}
+            key={`competitionsList-3`}
+          ></FlatList>}
+          {pressedSection=='Exhibitions' && 
+          <FlatList
+            data={exhibitions}
+            contentContainerStyle={styles.items}
+            renderItem={({item}) => {
+            return(<Exhibition exhibition={item}></Exhibition>)}}
+            numColumns={3}
+            scrollEnabled={false}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.1}
+            key={`exhibitionsList-3`}
           ></FlatList>}
         {loading && <ActivityIndicator></ActivityIndicator>}
           
@@ -211,10 +284,8 @@ const styles = StyleSheet.create({
   container:{
     flex: 1
   },
-  albums: {
+  items: {
     flex:1,
-    alignItems: 'center',
-    alignContent: 'space-between'
   },
   posts: {
     flex: 1,

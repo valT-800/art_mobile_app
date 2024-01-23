@@ -7,8 +7,6 @@ import {api} from "../services/api_base";
 import { AuthContext } from "../AuthProvider";
 import ImageComponent from "../components/Image";
 import List from "../components/SearchList";
-import { NormalText } from "../components/AppTextComponents";
-import TouchableText from "../components/TouchableText";
 import TouchableSection from "../components/TouchableSection";
 import Exhibition from "../components/Exhibition";
 
@@ -35,8 +33,7 @@ function GlobalScreen({navigation: {navigate}}){
         setCompetitions([])
         setExhibitions([])
         setCurrentPage(1)
-        setPressedSection('Posts')
-        getPosts()
+        fetchData()
         setTimeout(() => {
             setRefresh(false)
         }, 1000);
@@ -58,6 +55,19 @@ function GlobalScreen({navigation: {navigate}}){
 
     const getCompetitions = async () => {
         await api.get(`api/competitions/?page=${currentPage}`).then(response => {
+          const { data, meta } = response.data;
+          const competitionsArray = Object.values(data); 
+          setCompetitions((prevCompetitions) => [...prevCompetitions, ...competitionsArray]);
+          setTotalPages(meta.total);
+          console.log(competitionsArray)
+          setLoading(false);
+        }).catch(error => {
+          console.log("Error", error.response);
+          setLoading(false);
+      });
+    }
+    const getPlannedCompetitions = async () => {
+        await api.get(`api/planned-competitions/?page=${currentPage}`).then(response => {
           const { data, meta } = response.data;
           const competitionsArray = Object.values(data); 
           setCompetitions((prevCompetitions) => [...prevCompetitions, ...competitionsArray]);
@@ -86,7 +96,8 @@ function GlobalScreen({navigation: {navigate}}){
         await api.get(`api/posts/?page=${currentPage}`).then(response => {
           const { data, meta } = response.data;
           //console.log(data)
-          const postsArray = Object.values(data); 
+          const postsArray = Object.values(data);
+          console.log(postsArray)
           setPosts((prevPosts) => [...prevPosts, ...postsArray]);
           setTotalPages(meta.last_page);
           setLoading(false);
@@ -103,12 +114,15 @@ function GlobalScreen({navigation: {navigate}}){
           setLoading(true);
         }
       };
-    useEffect(()=>{
+      function fetchData(){
         if(pressedSection=='Posts') getPosts();
         else if(pressedSection=='Competitions') getCompetitions();
+        else if(pressedSection=='Planned competitions') getPlannedCompetitions();
         else if(pressedSection=='Exhibitions') getExhibitions();
         else getAlbums()
-
+      }
+    useEffect(()=>{
+        fetchData()
     },[currentPage])
 
     return(
@@ -130,8 +144,9 @@ function GlobalScreen({navigation: {navigate}}){
 
             ):(
             <View style={{flex: 1}}>
-                <View style = {{margin: 5, flexDirection:'row'}}>
+                <View style = {{margin: 5, flexDirection:'row', justifyContent:'space-evenly',flexWrap:'wrap'}}>
                     <TouchableSection title = 'Posts'
+                    pressedSection = 'Posts'
                         onPress={() => {
                         setPosts([])
                         setCurrentPage(1)
@@ -139,7 +154,26 @@ function GlobalScreen({navigation: {navigate}}){
                         setPressedSection('Posts')
                         }} 
                         pressed = {pressedSection}/>
+                        <TouchableSection title = 'Albums'
+                    pressedSection = 'Albums'
+                        onPress={() => {
+                        setAlbums([])
+                        setCurrentPage(1)
+                        getAlbums()
+                        setPressedSection('Albums')
+                        }}
+                        pressed = {pressedSection}/>
+                        <TouchableSection title = 'Coming competitions'
+                        pressedSection = 'Planned competitions'
+                            onPress={() => {
+                            setCompetitions([])
+                            setCurrentPage(1)
+                            getPlannedCompetitions()
+                            setPressedSection('Planned competitions')
+                            }} 
+                            pressed = {pressedSection}/>
                     <TouchableSection title = 'Competitions'
+                    pressedSection = 'Competitions'
                         onPress={() => {
                         setCompetitions([])
                         setCurrentPage(1)
@@ -148,6 +182,7 @@ function GlobalScreen({navigation: {navigate}}){
                         }} 
                         pressed = {pressedSection}/>
                     <TouchableSection title = 'Exhibitions'
+                    pressedSection = 'Exhibitions'
                         onPress={() => {
                         setExhibitions([])
                         setCurrentPage(1)
@@ -155,14 +190,6 @@ function GlobalScreen({navigation: {navigate}}){
                         setPressedSection('Exhibitions')
                         }}
                         pressed = {pressedSection}/>       
-                    <TouchableSection title = 'Albums'
-                        onPress={() => {
-                        setAlbums([])
-                        setCurrentPage(1)
-                        getAlbums()
-                        setPressedSection('Albums')
-                        }}
-                        pressed = {pressedSection}/>
                     </View>
                 <View>
                 { pressedSection === "Posts" &&    
@@ -170,23 +197,23 @@ function GlobalScreen({navigation: {navigate}}){
                 data={posts}
                 contentContainerStyle={styles.posts}
                 renderItem={({item}) => <ImageComponent post={item} />}
-                numColumns={3}
+                numColumns={2}
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={0.1}
-                key={`postsList-3`}
+                key={`postsList-2`}
                 refreshControl={
                     <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
                 }
                 />}
-                {pressedSection === "Competitions" &&
+                {(pressedSection === "Competitions" || pressedSection === "Planned competitions") &&
                 <FlatList
                 data={competitions}   
                 contentContainerStyle={styles.items}
-                numColumns={3}
-                renderItem={({ item }) => <Competition competition={item} />}
+                numColumns={2}
+                renderItem={({ item }) => <Competition competition={item} size={165}/>}
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={0.1}
-                key={`competitionsList-3`}
+                key={`competitionsList-2`}
                 refreshControl={
                     <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
                 }
@@ -195,11 +222,11 @@ function GlobalScreen({navigation: {navigate}}){
                 <FlatList
                 data={exhibitions}
                 contentContainerStyle={styles.items}
-                numColumns={3}
-                renderItem={({ item }) => <Exhibition exhibition={item} />}
+                numColumns={2}
+                renderItem={({ item }) => <Exhibition exhibition={item} size={165} />}
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={0.1}
-                key={`exhibitionsList-3`}
+                key={`exhibitionsList-2`}
                 refreshControl={
                     <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
                 }
@@ -208,11 +235,11 @@ function GlobalScreen({navigation: {navigate}}){
                 <FlatList
                 data={albums}
                 contentContainerStyle={styles.items}
-                numColumns={3}
-                renderItem={({ item }) => <Album album={item} />}
+                numColumns={2}
+                renderItem={({ item }) => <Album album={item} size={165} />}
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={0.1}
-                key={`albumsList-3`}
+                key={`albumsList-2`}
                 refreshControl={
                     <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
                 }
@@ -234,11 +261,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     items: {
-        alignContent: 'space-around',
-        alignItems:'center',
-        flex:1
+      flex:  1,
     },
     posts:{
-        flex:1
+        flex: Platform.OS === 'android' && 1,
     }
   });

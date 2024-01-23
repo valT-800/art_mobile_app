@@ -5,7 +5,7 @@ import { api } from "../../services/api_base";
 import { AuthContext } from "../../AuthProvider";
 import Album from "../../components/Album";
 
-export default function AlbumsScreen({navigation}){
+export default function AlbumsScreen({navigation:{navigate}}){
   const{user} = useContext(AuthContext)
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,9 +23,7 @@ export default function AlbumsScreen({navigation}){
   };
 
    const fetchAlbums = async () => {
-        
-        api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-        await api.get(`api/albums/?page=${currentPage}`).then(response => {
+        await api.get(`api/albums/user/${user.id}/?page=${currentPage}`).then(response => {
           const { data, meta } = response.data;
           const albumsArray = Object.values(data); 
           setAlbums((prevAlbums) => [...prevAlbums, ...albumsArray]);
@@ -51,14 +49,14 @@ export default function AlbumsScreen({navigation}){
   };
     return(
     <SafeAreaView style={styles.container}>
-      {albums.length > 0 ? (
+      {!loading ? (
         <FlatList
           data={albums}
-          numColumns={3}
-          renderItem={({ item }) => <Album album={item} />}
+          numColumns={2}
+          renderItem={({ item }) => <Album album={item} size={150}/>}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
-          key={`albumsList-3`}
+          key={`albumsList-2`}
           contentContainerStyle={styles.albums}
           refreshControl={
             <RefreshControl refreshing={loading} onRefresh={onRefresh} />
@@ -67,7 +65,6 @@ export default function AlbumsScreen({navigation}){
       ) : (
         <ActivityIndicator />
       )}
-      {loading && <ActivityIndicator/>}
     </SafeAreaView>
   );
 }
@@ -75,11 +72,9 @@ const styles = StyleSheet.create({
   container:{
     flex:1,
     justifyContent: 'center',
-    marginTop: 65,
   },
   albums:{
-    justifyContent: 'space-around',
-    alignItems:'center'
+    flex:1
     
   }
 });

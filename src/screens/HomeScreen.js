@@ -14,11 +14,13 @@ export default function HomeScreen({navigation}){
   const [totalPages, setTotalPages] = useState(1);
 
   const onRefresh = () => {
+    setLoading(true)
     setPosts([])
     setCurrentPage(1)
     fetchPosts()
     setTimeout(() => {
       setRefresh(false);
+      setLoading(false)
     }, 1000);
   };
   
@@ -28,12 +30,13 @@ export default function HomeScreen({navigation}){
       const { data, meta } = response.data;
       const postsArray = Object.values(data); 
       setPosts((prevPosts) => [...prevPosts, ...postsArray]);
-      setTotalPages(meta.last_page);
-      //console.log(posts)
+      setTotalPages(meta.last_page);   
       setLoading(false);
+      console.log("Posts",posts)
         }).catch(error => {
-          //console.log("Error", error);
-          setLoading(false);
+          console.log("Error", error);
+          
+      setLoading(false);
       });
   }
 
@@ -51,21 +54,17 @@ export default function HomeScreen({navigation}){
   };
     return(
     <SafeAreaView style={styles.container}>
-      {posts.length > 0 ? (
-        <FlatList
+        {posts && <FlatList
           data={posts}
-          renderItem={({ item }) => <Post item={item} />}
+          renderItem={({ item }) => <Post item={item}/>}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) => index}
           refreshControl={
             <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
           }
-        />
-      ) : (
-        <ActivityIndicator />
-      )}
-      {loading && <ActivityIndicator/>}
+        />}
+        {loading && <ActivityIndicator/>}
     </SafeAreaView>
   );
 }
@@ -73,6 +72,5 @@ const styles = StyleSheet.create({
   container:{
     flex:1,
     justifyContent: 'center',
-    paddingTop: 10
   }
 });
