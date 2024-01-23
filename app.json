@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "ART",
+    "name": "Art(Library)",
     "slug": "art_mobile_app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/my_icon.png",
+    "icon": "./assets/mine/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/mine/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,11 +19,12 @@
       "permissions": [
         "NSAppTransportSecurity",
         "NSAllowsArbitraryLoads"
-      ]
+      ],
+      "bundleIdentifier": "ArtCompetitions"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/mine/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
@@ -33,7 +34,7 @@
       "package": "com.val.ol.art_mobile_app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/mine/favicon.png"
     },
     "plugins": [
       [
