@@ -3,69 +3,43 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PostCollectionResource;
-use App\Http\Resources\PostResource;
+use App\Http\Resources\UserCollectionResource;
 use App\Http\Resources\UserResource;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class UsersController extends Controller
 {
+    
+
+    public function __construct()
+    {
+        request()->headers->set('Accept', 'application/json');
+    }
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
+
     public function index()
     {
-        $users = User::with('albums', 'posts', 'liked_posts', 'saved_posts', 'followers', 'following')->get();
-
-        return UserResource::collection($users);
+        $users = User::orderBy('created_at','desc')->paginate(20);
+        return new UserCollectionResource($users);
     }
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    
+    public function getUsersVoted(string $competition_id,string $id)
     {
-        //
+        $post = Post::findOrFail($id);
+        $users_voted = $post->users_voted()->where('competition_id',$competition_id)->get();
+        return response()->json(['users_voted' => $users_voted->count()]);
     }
-
     /**
      * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        $user = User::with('albums', 'posts', 'liked_posts', 'saved_posts', 'followers', 'following')->findOrFail($id);
+        $user = User::findOrFail($id);
         return new UserResource($user);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

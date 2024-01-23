@@ -4,7 +4,9 @@ namespace App\Http\Controllers\API\user;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PostCollectionResource;
+use App\Http\Resources\UserCollectionResource;
 use App\Http\Resources\UserResource;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\Request;
@@ -25,44 +27,23 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = User::with('albums', 'posts', 'liked_posts', 'saved_posts', 'following', 'followers')->get();
+        $users = User::all();
 
-        return UserResource::collection($users);
+        return new UserCollectionResource($users);
     }
-    public function getFollowingUsersPosts(Request $request)
+    public function getFollowingUsers()
     {
         $user = User::findOrFail(Auth::id());
-        $followingUsers = $user->following()->with('albums', 'posts', 'liked_posts', 'saved_posts', 'followers', 'following')->get();
-        $followingUsers = $user->following()->with(['posts.user', 'posts.comments', 'posts.users_liked', 'posts.users_saved', 'posts.tags', 'posts.competitions'])->get();
-        $posts = $followingUsers->pluck('posts')->flatten();
+        $followingUsers = $user->following()->orderBy('created_at', 'desc')->paginate(20);
 
-        $user = $posts->pluck('user')->flatten();
-        $comments = $posts->pluck('comments')->flatten();
-        $users_saved = $posts->pluck('users_saved')->flatten();
-        $users_liked = $posts->pluck('users_liked')->flatten();
-        $competitions = $posts->pluck('competitions')->flatten();
-
-        $tags = $posts->pluck('tags')->flatten();
-        $perPage = $request->input('per_page', 4); // Number of items per page, defaulting to 4
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $slicedPosts = $posts->slice(($currentPage - 1) * $perPage, $perPage);
-
-        $paginatedPosts = new LengthAwarePaginator(
-            $slicedPosts,
-            $posts->count(),
-            $perPage,
-            $currentPage
-        );
-        //return new PostCollectionResource($paginatedPosts, $user, $users_liked, $users_saved, $comments, $tags, $competitions);
-        return new PostCollectionResource($paginatedPosts);
+        return new UserCollectionResource($followingUsers);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function getFollowers()
     {
-        //
+        $user = User::findOrFail(Auth::id());
+        $followers = $user->followers()->orderBy('created_at', 'desc')->paginate(20);
+
+        return new UserCollectionResource($followers);
     }
 
     public function update(Request $request, string $id)
@@ -93,16 +74,24 @@ class UsersController extends Controller
         }
         if ($request->follow) {
             $user_followed = User::find($request->following_id);
-            $user_followed->followers()->sync($user->id);
+            $user_followed->followers()->attach($user->id,['created_at' => now(), 'updated_at' => now()]);
         } else if ($request->unfollow) {
             $user_followed = User::find($request->following_id);
             $user_followed->followers()->detach($user->id);
         }
         
     }
+    public function checkIfFollowing(string $id)
+    {
+        $user = User::findOrFail(Auth::id());
+        $following =$user->following()->where('following_id',$id)->get();
+        if ($following->count() > 0)
+        {return response()->json(['isFollowing'=>true]);}
+        else{ return response()->json(['isFollowing'=>false]);}
+    }
     protected function updateVerifiedUser(Request $request): void
     {
-        $user = User::with('albums', 'posts', 'liked_posts', 'saved_posts', 'following', 'followers')->findOrFail(Auth::id());
+        $user = User::findOrFail(Auth::id());
         $user->forceFill([
             'name' => $request->name,
             'email' => $request->email,
@@ -116,7 +105,7 @@ class UsersController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::with('albums', 'posts', 'liked_posts', 'saved_posts', 'following', 'followers')->findOrFail($id);
+        $user = User::findOrFail($id);
         return new UserResource($user);
     }
 

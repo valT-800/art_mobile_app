@@ -5,12 +5,14 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Http\Resources\UserResource;
+use App\Models\Level;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Laravel\Jetstream\Rules\Role;
 
 class AuthController extends BaseController
 {
@@ -42,12 +44,22 @@ class AuthController extends BaseController
             'password' => Hash::make($request->password),
             //'api_token' => Str::random(60),
         ]);
+        $level = Level::findOrFail(1);
+        $user->level()->associate($level)->save();
+        if($request->isGallerySelected)
+        {
+            $user->assignRole('gallery');
+        }else
+        {   
+            $user->assignRole('user');
+        }
         $success['token'] =  $user->createToken('MyApp')->plainTextToken;
         $success['username'] =  $user->username;
         $success['name'] =  $user->name;
         $success['id'] =  $user->id;
-
-
+        $success['roles'] = $user->roles->map(function ($item) {
+            return ['name' => $item->name];
+        });
         return $this->sendResponse($success, 'User register successfully.');
 
     }
@@ -60,15 +72,18 @@ class AuthController extends BaseController
     public function login(Request $request)
     {
 
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        if (Auth::attempt(['email' => $request->email_or_username, 'password' => $request->password]) || Auth::attempt(['username' => $request->email_or_username, 'password' => $request->password])) {
             $user = $request->user();
             $success['token'] = $user->createToken('MyApp')->plainTextToken;
             $success['username'] =  $user->username;
             $success['name'] =  $user->name;
             $success['id'] =  $user->id;
+            $success['roles'] = $user->roles->map(function ($item) {
+                return ['name' => $item->name];
+            });
             return $this->sendResponse($success, 'User login successfully.');
         } else {
-            return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
+            return $this->sendError('Unauthorised', 'wrong credentials');
         }
     
     }
@@ -86,19 +101,17 @@ class AuthController extends BaseController
                 //'profile_photo_url' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
             ]);
             if ($validator->fails()) {
-                return $this->sendError('Validation Error.', $validator->errors());
+                return $this->sendError('Validation Error', $validator->errors());
             }
 
-
-            if (
-                $request->email !== $user->email &&
-                $user instanceof MustVerifyEmail
-            ) {
+            if ($request->email != $user->email && $user instanceof MustVerifyEmail) 
+            {
                 $this->updateVerifiedUser($request);
             } else {
                 $user->forceFill([
                     'name' => $request->name,
                     'username' => $request->username,
+                    'email' => $request->email,
                 ])->update();
             }
         }
@@ -119,9 +132,10 @@ class AuthController extends BaseController
         $success['username'] =  $user->username;
         $success['name'] =  $user->name;
         $success['id'] =  $user->id;
+        $success['roles'] = $user->roles->map(function ($item) {
+            return ['name' => $item->name];
+        });
         return $this->sendResponse($success, 'User info updated successfully.');
-
-        //return new UserResource($user);
     }
 
     protected function updateVerifiedUser(Request $request): void
@@ -129,9 +143,10 @@ class AuthController extends BaseController
         $user = User::findOrFail(Auth::id());
         $user->forceFill([
             'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
             'email_verified_at' => null,
-        ])->save();
+        ])->update();
 
         $user->sendEmailVerificationNotification();
     }

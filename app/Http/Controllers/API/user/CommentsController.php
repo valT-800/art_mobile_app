@@ -74,7 +74,7 @@ class CommentsController extends Controller
         } else if ($request->user_unliked) {
             $comment->users_liked()->detach(Auth::id());
         }
-        $comment->update();
+        //$comment->update();
         return new CommentResource($comment);
     }
 

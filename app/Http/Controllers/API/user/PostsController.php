@@ -10,13 +10,12 @@ use App\Models\Competition;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use PhpParser\Node\Expr\FuncCall;
 
 class PostsController extends Controller
 {
@@ -30,19 +29,47 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('tags', 'competitions', 'users_liked', 'users_saved')->where('user_id', Auth::id())->orderBy('created_at', 'desc')->paginate(20);
+        $posts = Post::where('user_id', Auth::id())->orderBy('created_at', 'desc')->paginate(20);
         return new PostCollectionResource($posts);
     }
 
     public function getLikedPosts()
     {
-        $liked_posts = User::find(Auth::id())->liked_posts()->with('tags', 'competitions', 'users_liked', 'users_saved')->orderBy('created_at', 'desc')->paginate(20);
+        $liked_posts = User::find(Auth::id())->liked_posts()->orderBy('created_at', 'desc')->paginate(20);
         return new PostCollectionResource($liked_posts);
     }
     public function getSavedPosts()
     {
-        $saved_posts = User::find(Auth::id())->saved_posts()->with('tags', 'competitions', 'users_liked', 'users_saved')->orderBy('created_at', 'desc')->paginate(20);
+        $saved_posts = User::find(Auth::id())->saved_posts()->orderBy('created_at', 'desc')->paginate(20);
         return new PostCollectionResource($saved_posts);
+    }
+    public function getFollowingUsersPosts(Request $request)
+    {
+        
+        $user = User::findOrFail(Auth::id());
+
+        $followingIds = $user->following()->pluck('following_id')->push($user->id);
+        $paginatedPosts = Post::whereIn('user_id', $followingIds)
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+        
+        return new PostCollectionResource($paginatedPosts);
+    }
+    public function checkIfLiked(string $id)
+    {
+        $post = Post::findOrFail($id);
+        $user = $post->users_liked()->where('user_id',Auth::id());
+        if($user->count() > 0)
+        {return response()->json(['liked'=>true]);}
+        else{ return response()->json(['liked'=>false]);}
+    }
+    public function checkIfSaved(string $id)
+    {    
+        $post = Post::findOrFail($id);
+        $user = $post->users_saved()->where('user_id',Auth::id());
+        if($user->count() > 0)
+        {return response()->json(['saved'=>true]);}
+        else{ return response()->json(['saved'=>false]);}
     }
 
     /**
@@ -51,49 +78,32 @@ class PostsController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), ['post' => 'required|post|mimes:jpg,png,jpeg,gif,svg|max:2048']);
+        $validator = Validator::make($request->all(), 
+        ['image' => 'required|image|mimes:jpg,png,jpeg,gif,svg']
+        );
         if ($validator->fails()) {
-            return response()->json(['isSuccess' => false, 'message' => $validator->messages()], 400);
+            return response()->json(['isSuccess' => false, 'message' => 'File format is incompatible'],404);
         }
-        $file = $request->file('post');
-        $extension = $request->post->getClientOriginalExtension();
+        $file = $request->file('image');
+        $extension = $request->image->getClientOriginalExtension();
         $fileName = $file . '.' . uniqid() . '.' . $extension;
-        $path = $file->move('posts', $fileName);
+        $path = $file->move('images', $fileName);
         $post = Post::create([
             'description' => $request->description,
             'url' => $path,
         ]);
         $user = User::find(Auth::id());
-        $post->user()->associate($user);
+        $user->posts()->save($post);
         if ($request->album_id) {
             $album = Album::findOrFail($request->album_id);
-            $post->album()->associate($album);
+            $album->posts()->save($post);
+            $album->update();
         }
         if ($request->competition_id) {
-            $post->competitions()->sync($request->competition_id);
+            $competition = Competition::find($request->competition_id);
+            $competition->posts()->save($post);
         }
-
-
-        if ($request->input('tags')) {
-            $tags = $request->input('tags');
-            $tagIds = [];
-
-            foreach ($tags as $item) {
-                $tag = Tag::where('tag', $item)->first();
-                if (!$tag) {
-                    $validator = Validator::make($item, [
-                        'tag' => ['required', 'string', 'max:100', Rule::unique('tags')],
-                    ]);
-                    if ($validator->fails()) {
-                        return response()->json(['isSuccess' => false, 'message' => $validator->messages()]);
-                    }
-                    $tag = Tag::create(['tag' => $item]);
-                }
-                $tagIds[] = $tag->id;
-            }
-            $post->tags()->sync($tagIds);
-        }
-        $post->save();
+        //$post->save();
         return response()->json(['success' => true, 'data' => $post->id], 200);
     }
 
@@ -111,11 +121,11 @@ class PostsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $post = Post::with('tags', 'competitions', 'users_liked', 'users_saved')->findOrFail($id);
+        $post = Post::findOrFail($id);
         if ($request->edited) {
             $post->description = $request->description;
-            //$post->views = $request->views;
         }
+        $post->update();    
 
         if ($request->new_album_id) {
             if (isset($post->album)) {
@@ -126,40 +136,30 @@ class PostsController extends Controller
         }
 
         if ($request->user_liked) {
-            $post->users_liked()->sync(Auth::id());
+            $post->users_liked()->attach(Auth::id(), ['created_at' => now(), 'updated_at' => now()]);
         } else if ($request->user_unliked) {
             $post->users_liked()->detach(Auth::id());
         }
         if ($request->user_saved) {
-            $post->users_saved()->sync(Auth::id());
+            $post->users_saved()->attach(Auth::id(),['created_at' => now(), 'updated_at' => now()]);
         } else if ($request->user_unsaved) {
             $post->users_saved()->detach(Auth::id());
         }
         if (isset($request->competition_id)) {
-            $post->competitions()->sync($request->competition_id);
+            $post->competitions()->attach($request->competition_id,['created_at' => now(), 'updated_at' => now()]);
         }
-
-        if ($request->tags && is_array($request->tags)) {
-            $tagIds = [];
-            foreach ($request->tags as $item) {
-                $tag = Tag::where('tag', $item)->first();
-                if (!$tag) {
-                    $validator = Validator::make($item, [
-                        'tag' => ['required', 'string', 'max:100', Rule::unique('tags')],
-                    ]);
-                    if ($validator->fails()) {
-                        return response()->json(['isSuccess' => false, 'message' => $validator->messages()]);
-                    }
-                    $tag = Tag::create(['tag' => $item]);
-                }
-                $tagIds[] = $tag->id;
-            }
-            $post->tags()->attach($tagIds);
-        }
-        //$post->update();
         return new PostResource($post);
     }
-
+    public function like(string $id)
+    {
+        $post = Post::findOrFail($id);
+        $post->users_liked()->attach(Auth::id(), ['created_at' => now(), 'updated_at' => now()]);
+    }
+    public function unlike(string $id)
+    {
+        $post = Post::findOrFail($id);
+        $post->users_liked()->detach(Auth::id());
+    }
     /**
      * Remove the specified resource from storage.
      */
@@ -171,10 +171,9 @@ class PostsController extends Controller
         if (file_exists($post->url)) {
             unlink($post->url);
         }
-
-        // Delete the post record from the database
         $post->delete();
 
         return response()->json(['message' => 'Post deleted successfully']);
     }
+    
 }

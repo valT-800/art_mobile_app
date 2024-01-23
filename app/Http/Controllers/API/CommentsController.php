@@ -20,21 +20,14 @@ class CommentsController extends Controller
      */
     public function index()
     {
-        $comments = Comment::with('parent', 'comments')->get();
+        $comments = Comment::all();
         return CommentResource::collection($comments);
     }
-    public function getbyPostId(string $id)
+    public function getPostComments(string $id)
     {
         $post = Post::find($id);
-        $comments = $post->comments()->with('comments')->where('parent_id', null)->get();
+        $comments = $post->comments()->where('parent_id', null)->get();
         return CommentResource::collection($comments);
-    }
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
     }
 
     /**
@@ -42,23 +35,7 @@ class CommentsController extends Controller
      */
     public function show(string $id)
     {
-        $comments = Comment::with('parent', 'comments')->findOrFail($id);
+        $comments = Comment::findOrFail($id);
         return new CommentResource($comments);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

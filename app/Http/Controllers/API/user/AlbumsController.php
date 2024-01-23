@@ -9,6 +9,7 @@ use App\Models\Album;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AlbumsController extends BaseController
 {
@@ -22,7 +23,7 @@ class AlbumsController extends BaseController
      */
     public function index()
     {
-        $albums = Album::with('posts')->where('user_id', Auth::id())->get();
+        $albums = Album::where('user_id', Auth::id())->get();
         return AlbumResource::collection($albums);
     }
 
@@ -31,8 +32,15 @@ class AlbumsController extends BaseController
      */
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+        'title' => 'required|string|max:191',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['isSuccess' => false, 'message' => $validator->messages()],404);
+        }
         $user = User::find(Auth::id());
         $user->albums()->create($request->all());
+        return response()->json(['isSuccess' => true, 'message' => 'Album is succesfully created']);
     }
 
     /**
@@ -49,6 +57,12 @@ class AlbumsController extends BaseController
      */
     public function update(Request $request, string $id)
     {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:191',
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['isSuccess' => false, 'message' => $validator->messages()],404);
+            }
         $album = Album::findOrFail($id);
         $album->title = $request->title;
         $album->description = $request->description;

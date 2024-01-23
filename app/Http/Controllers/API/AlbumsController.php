@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AlbumCollectionResource;
 use App\Http\Resources\AlbumResource;
 use App\Models\Album;
 use App\Models\User;
@@ -20,46 +21,27 @@ class AlbumsController extends Controller
      */
     public function index()
     {
-        $albums = Album::with('posts')->get();
-        return AlbumResource::collection($albums);
+        $albums = Album::orderBy('updated_at','desc')->paginate(20);
+        return new AlbumCollectionResource($albums);
     }
-    public function getbyUserId(string $id)
+    public function getUserAlbums(string $id)
     {
         $user = User::findOrFail($id);
-        $albums = $user->albums()->with('posts')->get();
+        $albums = $user->albums()->orderBy('updated_at','desc')->paginate(20);
+        return new AlbumCollectionResource($albums);
+    }
+    public function getUserAlbumsShort(string $id)
+    {
+        $user = User::findOrFail($id);
+        $albums = $user->albums()->get();
         return AlbumResource::collection($albums);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        $albums = Album::with('posts')->findOrFail($id);
+        $albums = Album::findOrFail($id);
         return new AlbumResource($albums);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

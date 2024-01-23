@@ -25,7 +25,10 @@ class PostsController extends Controller
      */
     public function create()
     {
-        //
+        $user = User::findOrFail(Auth::id());
+        $post =Post::create(['description'=>'','url'=>'htttttttp']);
+        $user->posts()->save($post);
+        dd($post);
     }
 
     /**
@@ -33,7 +36,7 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
