@@ -51,20 +51,17 @@ export default function FollowingUsersScreen({navigation}){
   };
     return(
     <SafeAreaView style={styles.container}>
-      {users.length > 0 ? (
+      {users.length > 0 &&
         <FlatList
           data={users}
           renderItem={({ item }) => <User user={item} />}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item,index) => index}
           refreshControl={
             <RefreshControl refreshing={loading} onRefresh={onRefresh} />
           }
-        />
-      ) : (
-        <ActivityIndicator />
-      )}
+        />}
       {loading && <ActivityIndicator/>}
     </SafeAreaView>
   );

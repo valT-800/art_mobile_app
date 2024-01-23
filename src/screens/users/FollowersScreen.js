@@ -6,7 +6,6 @@ import { AuthContext } from "../../AuthProvider";
 import User from "../../components/User";
 
 export default function FollowersScreen({navigation}){
-  const{user} = useContext(AuthContext)
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -23,8 +22,6 @@ export default function FollowersScreen({navigation}){
   };
 
    const fetchUsers = async () => {
-        
-        api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
         await api.get(`api/user/followers/?page=${currentPage}`).then(response => {
           const { data, meta } = response.data;
           const usersArray = Object.values(data); 
@@ -36,6 +33,7 @@ export default function FollowersScreen({navigation}){
           //console.log("Error", error);
           setLoading(false);
       });
+      
     }
   useEffect(() => {
     fetchUsers()
@@ -51,20 +49,18 @@ export default function FollowersScreen({navigation}){
   };
     return(
     <SafeAreaView style={styles.container}>
-      {users.length > 0 ? (
+      {users.length > 0 &&
         <FlatList
           data={users}
           renderItem={({ item }) => <User user={item} />}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item,index) => index}
           refreshControl={
             <RefreshControl refreshing={loading} onRefresh={onRefresh} />
           }
         />
-      ) : (
-        <ActivityIndicator />
-      )}
+      }
       {loading && <ActivityIndicator/>}
     </SafeAreaView>
   );
