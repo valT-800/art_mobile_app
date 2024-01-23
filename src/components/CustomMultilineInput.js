@@ -23,8 +23,8 @@ function CustomMultilineInput({style, value, placeholder, textContentType, onCha
 export default CustomMultilineInput;
 const styles = StyleSheet.create({
     container: {
+        margin:5,
         padding:10,
-        textAlign: 'left',
-        maxHeight: 100
+        textAlign: 'left'
     }
 })

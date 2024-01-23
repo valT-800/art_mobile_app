@@ -1,17 +1,14 @@
 
 import { useNavigation, useTheme } from "@react-navigation/native";
-import { Image } from "expo-image";
-import { ActivityIndicator, Alert, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, Image, Modal, SafeAreaView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
 import CustomIcon from "./CustomIcon";
 import User from "./User";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../AuthProvider";
-import {baseURL } from "../services/api_base";
-import {BoldText} from "./AppTextComponents";
-import {NormalText} from "./AppTextComponents";
+import {api, baseURL } from "../services/api_base";
+import {BoldText, MultilineText} from "./AppTextComponents";
+import TouchableText from "./TouchableText";
 import {OtherText} from "./AppTextComponents";
-import postIsLiked from "../utils/postIsLiked";
-import postIsSaved from "../utils/postIsSaved";
 import savePost from "../utils/savePost";
 import unsavePost from "../utils/unsavePost";
 import unlikePost from "../utils/unlikePost";
@@ -29,6 +26,7 @@ export default function Post({item}){
   const[liked, setLiked] = useState(false)
   const[saved, setSaved] = useState(false)
   const[visible, setVisible]= useState(false)
+
   const handleDelete=()=>{
     Alert.alert('Confirm delete', 'Are you sure you want to delete?', [
       {
@@ -43,20 +41,39 @@ export default function Post({item}){
       cancelable: true,
     });
   }
+  async function isLiked(){
+    await api.get(`api/user/liked/post/${post.id}`).then(response => {
+      console.log('Liked',response.data.liked)
+      setLiked(response.data.liked)
+  }).catch(error => {
+    console.log(error.response);
+  })}
+  async function isSaved(){
+    await api.get(`api/user/saved/post/${post.id}`).then(response => {
+      console.log('Saved',response.data.saved)
+      setSaved(response.data.saved)
+  }).catch(error => {
+    console.log(error.response);
+  })}
   useEffect(()=>{
-    setLiked(postIsLiked(post, user.id))
-    setSaved(postIsSaved(post, user.id))
-  })
+    isLiked()
+    isSaved()
+  },[post])
+
   return(
-    
-        <View>
+        <SafeAreaView style={{flex:1}}>
           <View style= {{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 5}}>
             <User user={post.user}/>
             <CustomIcon name = 'ellipsis-horizontal-outline' size={30} event={()=>setVisible(true)}></CustomIcon>
           </View>
-          <Image style={[styles.post,{width: '100%'}]}
+          <TouchableHighlight onPress={()=>navigation.navigate('PostFull',{id:post.id})}>
+          <Image resizeMode='cover' style={styles.post}
               source={{uri: baseURL + post.url} }>
           </Image>
+          </TouchableHighlight>
+          {/*<Image resizeMode='cover' style={styles.post}
+              source={{uri: baseURL + post.url} }>
+        </Image>*/}
           <View style={{paddingHorizontal:5}}>
             <View style ={{margin: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
               <BoldText text={post.users_liked ? (post.users_liked.length +" likes") : (0 +" likes")}/>
@@ -65,42 +82,36 @@ export default function Post({item}){
                 <CustomIcon name='heart' size={30} event={async()=>{
                   let result = await unlikePost(post.id)
                   setPost(result)
-                  setLiked(false)}}/> :
+                }}/> :
               <CustomIcon name='heart-outline' size={30} event={async()=>{
                 let result = await likePost(post.id)
-                setPost(result)
-                setLiked(true)}}/>
+                setPost(result)}}/>
                 }
               <CustomIcon name='chatbubbles-outline' event={()=>navigation.navigate('Comments', {post_id: post.id})} size={30}/>
               {/* <CustomIcon name='arrow-redo-outline' size={30}/> */}
               {saved ? <CustomIcon name='bookmark' size={30} event={async()=>{
                   let result = await unsavePost(post.id)
-                  setPost(result)
-                  setSaved(false)}}/> :
+                  setPost(result)}}/> :
               <CustomIcon name='bookmark-outline' size={30} event={async()=>{
                 let result = await savePost(post.id)
-                setPost(result)
-                setSaved(true)}}/>}
+                setPost(result)}}/>}
               </View>
             </View>
-            {post.description && <NormalText text={post.description}/>}
-            {post.tags &&  <FlatList
-              data={post.tags}
-              renderItem={({item})=>{
-                return(
-                <TouchableOpacity onPress={()=>navigation.navigate('Tag', {id: item.id})}><OtherText text={item.tag}/></TouchableOpacity>
-                )
-              }}
-              >
-            </FlatList>}
-            {post.tags && <View style={{width: '100%'}}>
+            {post.winnings.length>0 && 
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+              <OtherText text='Winnigs '/>
             <FlatList
-            data={post.tags}
-            renderItem={({item})=><TouchableOpacity onPress={()=>navigation.navigate('Tag', {id: item.id})}><OtherText text={`#${item.tag}`}/></TouchableOpacity>}
-            keyExtractor={(item) => item.id}
             horizontal
-            />
-          </View>}
+            data={post.winnings}
+            keyExtractor = {( item, index) => item.id }
+            renderItem={({ item }) =>{
+            return(
+              <View style={{backgroundColor: 'rgba(255, 211, 67,0.6)',borderRadius: 50, padding:5,alignItems:'center'}}>
+            <TouchableText title={item.title} onPress={()=>navigation.navigate('Competition', {id: item.id})}/>
+            </View>)}}></FlatList>
+            </View>}
+            {post.description && 
+            <MultilineText text={post.description} fontSize={14}/>}
             {post.comments &&
             <View>
               <TouchableOpacity onPress={()=>navigation.navigate('Comments', {post_id: post.id})}><OtherText text="View all comments"/></TouchableOpacity>
@@ -115,9 +126,10 @@ export default function Post({item}){
             </CustomIcon>
             {user.id == post.user.id && <TouchableListItem title='Edit' onPress={()=>navigation.navigate('EditPost', post)}/>}
             {user.id == post.user.id && <TouchableListItem title='Delete' onPress={handleDelete}/>}
+            {user.roles.some(r=>r.name=='gallery') && <TouchableListItem title='Invite to exhibition' onPress={()=>navigation.navigate('PlannedExhibitions',{post_id:post.id})}/>}
           </View>
         </Modal>
-        </View>
+        </SafeAreaView>
       
                              
     )
@@ -131,7 +143,9 @@ const styles = StyleSheet.create({
       alignItems: 'center'
     },
     post:{
-      minHeight:300,
+      width: '100%',
+      height: undefined, 
+      aspectRatio: 1, 
     },
     overlayContainer: {
       borderTopLeftRadius: 10,

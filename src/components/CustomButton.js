@@ -3,12 +3,12 @@ import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 // Black background and white text in light theme, inverted on dark theme
-function CustomButton({title, onPress}) {
+function CustomButton({title, onPress, style}) {
   const { colors } = useTheme();
 
   return (
-    <TouchableOpacity style={[styles.button, { backgroundColor: colors.card }]} onPress = {onPress}>
-      <Text style={{ color: colors.text }}>{title}</Text>
+    <TouchableOpacity style={[styles.button, { backgroundColor: colors.card },style]} onPress = {onPress}>
+      <Text style={{ color: colors.text, textAlign:'center'}}>{title}</Text>
     </TouchableOpacity>
   );
 }
@@ -18,5 +18,6 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 10,
         margin: 5,
+        justifyContent:'center'
     }
 })

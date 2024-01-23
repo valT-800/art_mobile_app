@@ -32,11 +32,11 @@ export default function Comment({item, setParent, setContent}){
             setContent('@'+comment.user.username)
           }}>
               <View style = {styles.comment}>
-                <View>
+                <View style={{flex:0.85}}>
                   <NormalText text={comment.content}/>
                   {comment.comments && <OtherText text={"Comments "+comment.comments.length}/>}
                 </View>
-                <View style = {{flexDirection: 'row'}}>
+                <View style = {{flexDirection: 'row',flex:0.15}}>
                 {liked ? <CustomIcon name='heart' size={20} event={async ()=>{
                   let result = await unlikeComment(comment.id)
                   //console.log(result)
@@ -74,6 +74,7 @@ export default function Comment({item, setParent, setContent}){
 }
 const styles = StyleSheet.create({
   comment: {
+    flex:1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

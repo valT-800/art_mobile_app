@@ -1,57 +1,45 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { useState } from "react";
-import {  Post, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {  StyleSheet, Text, TouchableOpacity, View, Image, ImageBackground } from "react-native";
 import { baseURL } from "../services/api_base";
+import { BoldText, NormalText, OtherText } from "./AppTextComponents";
+import Timer from "./Timer";
 
-export default function Competition({competition}){
+export default function Competition({competition,size}){
 
   const navigation = useNavigation();
-  const[url, setUrl] = useState('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6MZSGFFo2KYnkE9K23hpeloGmGBEe1L_yYA&usqp=CAU')
-
-
-  const firstPostUrl  = () => {
-
-    //console.log(album.posts)
-    if(competition.posts.length > 0){
-      let post = competition.posts.shift()
-      //console.log(post.url)
-      setUrl(baseURL+post.url) 
-    }
-  }
-
+  const {colors} = useTheme()
     return(
-      <View style={styles.container}>
-      {firstPostUrl()}
-      <TouchableOpacity onPress={()=> navigation.navigate('Competition', {id: competition.id})}>
-          <ImageBackground source={{uri: url}}
-          imageStyle={{borderRadius: 10}}
-        style={styles.image}>
-          <Text style = {styles.title}>{competition.title}</Text> 
-      </ImageBackground>
+      <TouchableOpacity style={[styles.container,{backgroundColor: colors.card}]} onPress={()=> navigation.navigate('Competition', {id: competition.id})}>
+      <View style={{maxHeight: 70,alignItems:'center'}}><BoldText text={competition.title}/></View>
+      {competition.starts_in && <Timer interval={competition.starts_in} size={'small'}/> }
+      {!competition.starts_in && competition.post &&
+      <ImageBackground source={{uri: competition.post? baseURL+competition.post.url: baseURL+'images/app/competition_cover.jpg'}}
+      imageStyle={{borderRadius:10}}
+          style={[styles.image,{height: size? size: 100}]}>
+       {competition.ends_in &&  <Timer interval={competition.ends_in} size={'small'}/>}
+      </ImageBackground>}
+      {!competition.starts_in && !competition.post && competition.ends_in && <Timer interval={competition.ends_in} size={'small'}/>}
+      {competition.public==1 && <View style={{flex:1,flexDirection:'row',alignItems:'flex-end',justifyContent:'space-between',margin:5}}>
+        <TouchableOpacity style={{flex: 0.6}} onPress={()=>navigation.navigate('User',{id:competition.user.id})}><NormalText text={competition.user.username}/></TouchableOpacity>
+          {competition.post && <View style={{flex:0.4,alignItems:'flex-end'}}><OtherText text={competition.posts + ' posts'}/></View>}
+      </View>}
       </TouchableOpacity>
-    </View>
-                     
     );
 }
 
 
 const styles = StyleSheet.create({
   container:{
+    flex: 1,
+    padding:5,
     margin:5,
-    justifyContent:'center',
-    alignItems:'center',
+    borderRadius: 10,
+     maxWidth:'50%',
   },
   image:{
-    height: 100,
-    width: 100,
-    justifyContent: 'center',
-    alignItems:'center'
-  },
-  title:{
-    padding: 5,
-    color:'white',
-    fontWeight: 500,
-    textShadowColor: 'black',
-    textShadowRadius: 20,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    borderRadius: 10
   }
 });

@@ -1,35 +1,28 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { useState } from "react";
-import {  Post, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { baseURL } from "../services/api_base";
+import { BoldText, NormalText, OtherText } from "./AppTextComponents";
+import Timer from "./Timer";
 
-export default function Exhibition({exhibition}){
+export default function Exhibition({exhibition,size,onPress}){
 
   const navigation = useNavigation();
-  const[url, setUrl] = useState('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6MZSGFFo2KYnkE9K23hpeloGmGBEe1L_yYA&usqp=CAU')
+  const {colors} = useTheme()
 
-
-  const firstPostUrl  = () => {
-
-    //console.log(album.posts)
-    if(exhibition.posts.length > 0){
-      let post = exhibition.posts.shift()
-      //console.log(post.url)
-      setUrl(baseURL+post.url) 
-    }
-  }
-
-    return(
-      <View style={styles.container}>
-      {firstPostUrl()}
-      <TouchableOpacity onPress={()=> navigation.navigate('Exhibition', {id: exhibition.id})}>
-          <ImageBackground source={{uri: url}}
-          imageStyle={{borderRadius: 10}}
-        style={styles.image}>
-          <Text style = {styles.title}>{exhibition.title}</Text> 
-      </ImageBackground>
+  return(
+    <TouchableOpacity style={[styles.container,{backgroundColor: colors.card}]} onPress={onPress ? onPress : ()=> navigation.navigate('Exhibition', {id: exhibition.id})}>
+      <View style={{maxHeight: 70,alignItems:'center'}}><BoldText text={exhibition.title}/></View>
+      {exhibition.starts_in && <Timer interval={exhibition.starts_in} size={'small'}/> }
+      {!exhibition.starts_in && exhibition.post &&
+      <Image source={{uri: exhibition.post? baseURL+exhibition.post.url: baseURL+'images/app/competition_cover.jpg'}}
+          style={[styles.image,{height: size? size: 90}]}>
+      </Image>}
+      {exhibition.public==1 && <View style={{flex:1,flexDirection:'row',alignItems:'flex-end',justifyContent:'space-between',margin:5}}>
+        <TouchableOpacity style={{flex: 0.6}} onPress={()=>navigation.navigate('User',{id:exhibition.user.id})}><NormalText text={exhibition.user.username}/></TouchableOpacity>
+        {exhibition.post && <View style={{flex:0.4,alignItems:'flex-end'}}><OtherText text={exhibition.posts+' posts'}/></View>}
+      </View>}
       </TouchableOpacity>
-    </View>
                      
     );
 }
@@ -37,21 +30,15 @@ export default function Exhibition({exhibition}){
 
 const styles = StyleSheet.create({
   container:{
+    flex: 1,
+    padding:5,
     margin:5,
-    justifyContent:'center',
-    alignItems:'center',
+    borderRadius: 10,
+    maxWidth:'50%',
   },
   image:{
-    height: 100,
-    width: 100,
     justifyContent: 'center',
-    alignItems:'center'
-  },
-  title:{
-    padding: 5,
-    color:'white',
-    fontWeight: 500,
-    textShadowColor: 'black',
-    textShadowRadius: 20,
+    alignItems: 'center',
+    borderRadius: 10
   }
 });

@@ -112,8 +112,9 @@ const List = ({searchPhrase, setClicked, data, setData}) => {
           setClicked(false);
         }}
       >
-        <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'center', width: '100%'}}>
+        <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'center', width: '100%', flexWrap:'wrap'}}>
             <TouchableSection title = 'Users' 
+            pressedSection = 'Users' 
             onPress={async() => {
               setData([])
               setPressedSection('Users')
@@ -122,6 +123,7 @@ const List = ({searchPhrase, setClicked, data, setData}) => {
             }} 
             pressed = {pressedSection}/>
             <TouchableSection title = 'Albums'
+            pressedSection = 'Albums'
             onPress={async() => {
               setData([])
               setPressedSection('Albums')
@@ -131,6 +133,7 @@ const List = ({searchPhrase, setClicked, data, setData}) => {
             }} 
             pressed = {pressedSection}/>
             <TouchableSection title = 'Competitions'
+            pressedSection = 'Competitions'
             onPress={async() => {
               setData([])
               setPressedSection('Competitions')
@@ -139,6 +142,7 @@ const List = ({searchPhrase, setClicked, data, setData}) => {
             }} 
              pressed = {pressedSection}/>
              <TouchableSection title = 'Exhibitions'
+             pressedSection = 'Exhibitions'
              onPress={async() => {
                setData([])
                setPressedSection('Exhibitions')
