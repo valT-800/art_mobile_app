@@ -11,19 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('exhibitions', function (Blueprint $table) {
+        Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('description')->nullable();
-            $table->foreignId('user_id')->unsigned();
-            $table->boolean('public')->default(false);
-            $table->timestamp('start_time')->nullable();
-            $table->timestamp('end_time')->nullable();
-
-            $table->foreign('user_id')->references('id')->on('users');
-
+            $table->text('description');
             $table->timestamps();
-
         });
     }
 
@@ -32,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('exhibitions');
+        Schema::dropIfExists('notifications');
     }
 };
