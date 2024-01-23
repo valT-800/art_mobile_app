@@ -3,6 +3,8 @@ import {
  View,
  StyleSheet,
  SafeAreaView,
+ Text,
+ ScrollView,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {NormalText} from "../../components/AppTextComponents";
@@ -22,31 +24,13 @@ export default function NewExhibitionScreen({navigation: {navigate, setOptions}}
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const{user} = useContext(AuthContext)
+    const [error, setError] = useState([]);
+    const now = new Date()
+    const maxStartTime = new Date()
+    const minEndTime = new Date()
+    const maxEndTime = new Date()
+    const minStartTime = new Date()
 
-    const maxStartDate = new Date()
-    const minEndDate = new Date()
-    const maxEndDate = new Date()
-    const minStartDate = new Date()
-
-    const setMinMax =(time)=>{
-        minStartDate.setDate(time.getDate()+1)
-        maxStartDate.setDate(time.getDate() + 15);
-        minEndDate.setDate(time.getDate() + 2)
-        maxEndDate.setDate(time.getDate() + 30);
-        if(startTime<minStartDate) setStartTime(minStartDate)
-        if(endTime<minEndDate) setEndTime(minEndDate)
-    }
-
-    async function newExhibition (title, description, start_time, end_time) {
-
-        api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`; 
-        console.log({title, description, start_time, end_time})
-        await api.post('api/gallery/exhibitions', {title, description, start_time, end_time})
-        .then((response) => {
-            console.log(response.data.message)
-            navigate('Profile')
-        }).catch((err) => console.log(err))
-    }
     setOptions({
         headerRight: () =>
         <CustomIcon name='checkmark' size={30}
@@ -58,13 +42,48 @@ export default function NewExhibitionScreen({navigation: {navigate, setOptions}}
             }}
         />
     });
+    
+    minStartTime.setDate(now.getDate() + 1)
+    maxStartTime.setDate(now.getDate() + 10)
+    minEndTime.setDate(now.getDate() + 2)
+    maxEndTime.setDate(now.getDate() + 20);
+
+    useEffect(()=>{
+        startTime<minStartTime && setStartTime(minStartTime)
+        endTime<minEndTime && setEndTime(minEndTime)
+    },[])
+    const setMinMax =(time)=>{
+        console.log('Time',time)
+        minEndTime.setDate(time.getDate() + 2)
+        //maxEndTime.setDate(time.getDate() + 20);   
+        console.log('Start time',startTime)  
+        console.log('End time',endTime)
+    }
+
+    async function newExhibition (title, description, start_time, end_time) {
+
+        api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`; 
+        console.log({title, description, start_time, end_time})
+        await api.post('api/gallery/exhibitions', {title, description, start_time, end_time})
+        .then((response) => {
+            console.log(response.data.message)
+            navigate('Profile')
+        }).catch((err) => {
+            console.log(err.response.data.message)
+            setError(err.response.data.message)})
+    }
+    
     useEffect(()=>{
         setMinMax(startTime)
     },[startTime])
 
     return (
     <SafeAreaView style={styles.container}>
+        <ScrollView>
         <View style={{padding: 10, width: '100%', alignItems: 'center'}}>
+        { error && error.title &&
+            <Text style={{ color: 'red', marginBottom: 24 }}>{error.title}</Text>
+            }
             <NormalText text='Title'/>
             <CustomInput
                 onChangeText={(text)=>setTitle(text)}
@@ -77,47 +96,53 @@ export default function NewExhibitionScreen({navigation: {navigate, setOptions}}
                 value={description}
                 placeholder="Enter Description"
             />
+            { error && error.start_time &&
+            <Text style={{ color: 'red', marginBottom: 24 }}>{error.start_time}</Text>
+            }
             <NormalText text='Start time'/>
             <View style={{flexDirection:'row'}}>
-                <CustomButton title={startTime.getMonth().toString()+'m-'+startTime.getDate().toString()+'d'} onPress={()=>{
+            <CustomButton title={startTime.toLocaleDateString()} onPress={()=>{
                     setShowStart(true)
                     setMode('date')
                     }}/>
-                    <CustomButton title={startTime.getHours().toString()+':'+startTime.getMinutes().toString()} onPress={()=>{
+                <CustomButton title={startTime.toLocaleTimeString()} onPress={()=>{
                         setShowStart(true)
                         setMode('time')
-                        }}/>
-
+                }}/>
                 </View>
                 {showStart && <DateTimePicker
                 value={startTime}
-                //maximumDate={maxStartDate}
-                //minimumDate={minStartDate}
+                maximumDate={maxStartTime}
+                minimumDate={minStartTime}
                 mode={mode}
                 onChange={(event, selectedTime) => {
                     if (event.type === "set") {
                       // Handle the date change only if the user presses "Set"
                       setStartTime(selectedTime);
+                      setMinMax(selectedTime);
                     }
                     setShowStart(false)}
                 }/>}
+            { error && error.end_time &&
+            <Text style={{ color: 'red', marginBottom: 24 }}>{error.end_time}</Text>
+            }
             <NormalText text='End time'/>
             <View style={{flexDirection:'row'}}>
-                <CustomButton title={endTime.getMonth().toString()+'m-'+endTime.getDate().toString()+'d'} onPress={()=>{
-                    setShowEnd(true)
-                    setMode('date')
-                    }}/>
-                    <CustomButton title={endTime.getHours().toString()+':'+endTime.getMinutes().toString()} onPress={()=>{
-                        setShowEnd(true)
-                        setMode('time')
-                        }}/>
+            <CustomButton title={endTime.toLocaleDateString()} onPress={()=>{
+                setShowEnd(true)
+                setMode('date')
+            }}/>
+            <CustomButton title={endTime.toLocaleTimeString()} onPress={()=>{
+                setShowEnd(true)
+                setMode('time')
+            }}/>
 
                 </View>
             
             {showEnd && <DateTimePicker
                 value={endTime}
-                //maximumDate={maxEndDate}
-                //minimumDate={minEndDate}
+                maximumDate={maxEndTime}
+                minimumDate={minEndTime}
                 mode={mode}
                 onChange={(event, selectedTime) => {
                     if (event.type === "set") {
@@ -127,6 +152,7 @@ export default function NewExhibitionScreen({navigation: {navigate, setOptions}}
                     setShowEnd(false)}}
                 />}
         </View>
+        </ScrollView>
     </SafeAreaView>
  );
 };

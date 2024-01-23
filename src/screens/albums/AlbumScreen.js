@@ -1,6 +1,6 @@
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { createContext, useContext, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, Modal, RefreshControl, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AuthContext } from "../../AuthProvider";
 import {api} from "../../services/api_base";
 import ImageComponent from "../../components/Image";
@@ -10,31 +10,46 @@ import getAlbum from "../../utils/getAlbum";
 import { Header } from "../../components/AppTextComponents";
 import CustomIcon from "../../components/CustomIcon";
 import TouchableListItem from "../../components/TouchableListItem";
+import User from "../../components/User";
 
 
 export default function AlbumScreen({route, navigation:{navigate,setOptions}}){
   const{user} =useContext(AuthContext)
   const[album,setAlbum]=useState([]);
   const [loading, setLoading] = useState(true);
-  const[visibleDescription, setVisibleDescription] = useState(false);
   const[visible, setVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [posts, setPosts] = useState([])
   const{id} = route.params;
   const {colors}= useTheme()
+  
   setOptions({
-    title: album.title,
+    title: album ? album.title : '',
     headerRight: () => <CustomIcon name = 'ellipsis-horizontal-outline' size={30} event={()=>setVisible(true)}></CustomIcon>
   });
 
+  const onRefresh = () => {
+    setLoading(true)
+    setVisible(false)
+    setAlbum([])
+    setPosts([])  
+    setCurrentPage(1)
+    fetchData()
+    getPosts()
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
+  
+  async function fetchData(){
+    let result = await getAlbum(id)
+    console.log(result)
+    setAlbum(result)
+    setLoading(false)
+  }
+  
   useEffect(() => {
-    async function fetchData(){
-      let result = await getAlbum(id)
-      console.log(result)
-      setAlbum(result)
-      setLoading(false)
-    }
     fetchData()
   }, []);
   useEffect(() => {
@@ -49,7 +64,7 @@ export default function AlbumScreen({route, navigation:{navigate,setOptions}}){
         style: 'cancel',
       },
       {text: 'OK', onPress: async() => { await deleteAlbum(album.id).then(
-        navigation.goBack())
+        navigate('Profile'))
       }},
     ],{
       cancelable: true,
@@ -74,6 +89,14 @@ export default function AlbumScreen({route, navigation:{navigate,setOptions}}){
       setLoading(false);
   });
 }
+const handleLoadMore = (event) => {
+  //console.log(currentPage)
+  if (currentPage < totalPages) {
+    setCurrentPage((prevPage) => prevPage + 1);
+    //console.log(currentPage)
+    setLoading(true);
+}
+};
 
   if(loading){
     return(
@@ -85,18 +108,23 @@ export default function AlbumScreen({route, navigation:{navigate,setOptions}}){
   }else{
     return(
         <SafeAreaView style= {styles.container}>
+          <ScrollView onScrollEndDrag={handleLoadMore}
+          scrollEventThrottle={16}
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={onRefresh} />}>
           <View style = {{alignItems: 'center'}}>
-            <TouchableOpacity onPress={()=>setVisibleDescription(!visibleDescription)}><Text style={{color:'grey'}}>About</Text></TouchableOpacity>
-            {visibleDescription && <ScrollView style={{maxHeight:'50%'}}>
+            <User user={album.user}></User>
+          <View style={{width:'100%',paddingHorizontal:10}}>
             <MultilineText text={album.description}/>
-            </ScrollView>}
+            </View> 
           </View>
           <View style={styles.posts}>
             <FlatList
               data={posts}
               renderItem={({item}) => {
               return(<ImageComponent post={item}></ImageComponent>)}}
-              numColumns={3}
+              numColumns={2}
+              scrollEnabled={false}
               keyExtractor = {( item, index) => item.id }
             ></FlatList> 
           </View>
@@ -108,6 +136,7 @@ export default function AlbumScreen({route, navigation:{navigate,setOptions}}){
             {album.user && user.id == album.user.id && <TouchableListItem title='Delete' onPress={handleDelete}/>}
           </View>
         </Modal>
+        </ScrollView>
         </SafeAreaView>
 
   );

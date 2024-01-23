@@ -4,7 +4,7 @@ import {api} from "../../services/api_base";
 import Post from "../../components/Post";
 
 
-export default function PostScreen({navigation, route}){
+export default function PostScreen({navigation:{navigate}, route}){
 
   const{id} = route.params;
   const[post, setPost] = useState({})
@@ -30,6 +30,7 @@ export default function PostScreen({navigation, route}){
 }
 const styles = StyleSheet.create({
   container:{
+    flex:1,
     paddingVertical:20,
     marginTop: 50
   },

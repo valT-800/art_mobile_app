@@ -7,6 +7,8 @@ import Comment from "../../components/Comment";
 import Divider from "../../components/Divider";
 import getPostComments from "../../utils/getPostComments";
 import newComment from "../../utils/newComment";
+import { MultilineText } from "../../components/AppTextComponents";
+import CustomMultilineInput from "../../components/CustomMultilineInput";
 
 export default function CommentsScreen({route, navigation:{navigate}}){
 
@@ -60,14 +62,14 @@ export default function CommentsScreen({route, navigation:{navigate}}){
       </View>
       }
       <View style={styles.footer}>
-      <TextInput
-          multiline
+      <CustomMultilineInput
           placeholder="Add a comment..."
+          style={{flex:0.85}}
           value={content}
           onChangeText={(text) => {
             setContent(text);
         }}/>
-        <CustomIcon name='arrow-redo-outline' event={()=>postComment()} size={30}/>
+        <CustomIcon style={{flex:0.15}} name='arrow-redo-outline' event={()=>postComment()} size={30}/>
       </View>
       
     </SafeAreaView>

@@ -1,42 +1,47 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { ActivityIndicator, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import {api, baseURL} from "../../services/api_base";
-import { AuthContext } from "../../AuthProvider";
 import CustomIcon from "../../components/CustomIcon";
 import User from "../../components/User";
-import { Post } from "expo-image";
-import { useTheme } from "@react-navigation/native";
+import { Image } from "expo-image";
 import editPost from "../../utils/editPost";
+import CustomMultilineInput from "../../components/CustomMultilineInput";
 
-export default function EditPostScreen({navigation:{navigate, setOptions}, route}){
+export default function EditPostScreen({navigation:{navigate, setOptions,goback}, route}){
 
     const{id, url, description, user} = route.params;
     const[newDescription, setDescription] = useState(description)
 
-    setOptions({
+      setOptions({
         headerRight: () =>
           <CustomIcon name='checkmark' size={30}
-            event={async() => {
-              await editPost(id, newDescription)
-              navigate('Post', {id})}}
+            event={() => updatePost(id, newDescription)}
             />
         });
-  
-   
+
+    function updatePost(){
+      console.log('Description', newDescription)
+      api.put(`api/user/posts/${id}`, {edited: true, description: newDescription}).then(response => {
+          console.log("Posteeeeeeeeeee",response.data);
+          navigate('Post', {id: response.data.id})
+      }).catch(error => {
+          console.log("Error", error.response);
+      });
+    }
     return(
         
           <SafeAreaView style={styles.container}>
-            
+            <ScrollView>
             <User user={user}/>
-            <Post style={[styles.post,{width: '100%'}]}
+            <Image style={[styles.post,{width: '100%'}]}
                 source={{uri: baseURL + url} }>
-            </Post>
-            <TextInput
+            </Image>
+            <CustomMultilineInput
             style = {styles.input}
             value={newDescription}
             onChangeText={(text)=>setDescription(text)}
             />
-            
+            </ScrollView>
         </SafeAreaView>
         
                                
@@ -49,12 +54,6 @@ export default function EditPostScreen({navigation:{navigate, setOptions}, route
       },
       post:{
         minHeight:300,
-      },
-      input:{
-        marginTop: 10,
-        borderColor: 'grey',
-        borderWidth: 1,
-        minHeight: 100,
       }
     });
     

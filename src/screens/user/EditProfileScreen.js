@@ -21,9 +21,8 @@ function EditProfileScreen({navigation: {navigate, setOptions}}){
     headerRight: () =>
     <CustomIcon name='checkmark' size = {30} event={()=>updateUserInfo()}></CustomIcon>
     });
-    
   const updateUserInfo =async()=>{
-    //console.log(name,username,email)
+    console.log(name,username,email)
     update(name, username, email)
     setLoading(true)
   }
@@ -34,8 +33,6 @@ function EditProfileScreen({navigation: {navigate, setOptions}}){
     setUsername(user.username)
   }
   useEffect(() => {
-    api.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-    
     api.get('api/user')
       .then(response => {
         
@@ -79,6 +76,7 @@ function EditProfileScreen({navigation: {navigate, setOptions}}){
               placeholder="Username"
               textContentType='nickname'
               value={username}
+              autoCapitalize='none'
           />
           { error && error.data.email &&
           <Text style={{ color: 'red', marginBottom: 24 }}>{error.data.email}</Text>
@@ -88,6 +86,7 @@ function EditProfileScreen({navigation: {navigate, setOptions}}){
               placeholder="Email"
               textContentType='emailAddress'
               value={email}
+              autoCapitalize='none'
           />
           </View>}
         </SafeAreaView>
