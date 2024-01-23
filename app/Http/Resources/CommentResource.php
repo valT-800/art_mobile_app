@@ -35,7 +35,7 @@ class CommentResource extends JsonResource
             $this->merge(['language' => $this->language])
         ];
     }
-    private function getTimeDifference($timestamp)
+    public static function getTimeDifference($timestamp)
     {
 
         $now = time();  // Current timestamp

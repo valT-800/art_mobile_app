@@ -14,6 +14,18 @@ class ExhibitionCollectionResource extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'data' => $this->collection->map(function ($exhibition) {
+                return new ExhibitionResource($exhibition);
+            }),
+            'meta' => [
+                'pagination' => [
+                    'total' => $this->total(),
+                    'per_page' => $this->perPage(),
+                    'current_page' => $this->currentPage(),
+                    'last_page' => $this->lastPage(),
+                ],
+            ],
+        ];
     }
 }

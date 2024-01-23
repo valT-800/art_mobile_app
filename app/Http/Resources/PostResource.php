@@ -20,7 +20,6 @@ class PostResource extends JsonResource
             'id' => $this->id,
             'description' => $this->description,
             'url' => $this->url,
-
             'album' => $this->album ? [
                 'title' => $this->album->title,
                 'id' => $this->album->id
@@ -31,21 +30,15 @@ class PostResource extends JsonResource
             'users_saved' => $this->users_saved->map(function ($item) {
                 return ['id' => $item->id, 'username' => $item->username];
             }),
-            'views' => $this->views,
             'user' => [
                 'id' => $this->user->id,
                 'username' => $this->user->username,
                 'profile_photo_url' => $this->user->profile_photo_url,
-
             ],
             'comments' => $this->comments,
-            'competitions' => $this->competitions->map(function ($item) {
-
-                return ['id' => $item->id, 'title' => $item->title];
-            }),
-            'tags' => $this->tags->map(function ($item) {
-                return ['id' => $item->id, 'tag' => $item->tag];
-            }),
+            'competitions' => $this->competitions->count(),
+            'winnings' => $this->winnings->map(function ($item) {return ['id' => $item->id, 'title' => $item->title];}),
+            'exhibitions' => $this->competitions->count(),
             'created_at' => $this->getTimeDifference($this->created_at->timestamp),
             $this->merge(['language' => $this->language]),
         ];

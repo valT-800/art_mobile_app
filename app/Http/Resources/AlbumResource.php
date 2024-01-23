@@ -18,14 +18,13 @@ class AlbumResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
-            'username' => $this->user->username,
-            'user_id' => $this->user->id,
-            'posts' => $this->posts->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'url' => $item->url,
-                ];
-            }),
+            'user' => [
+                'id' => $this->user->id,
+                'username' => $this->user->username,
+                'profile_photo_url' => $this->user->profile_photo_url,
+            ],
+            'posts' => $this->posts->count(),
+            'post' => new PostResource($this->posts->first()),
             $this->merge(['language' => $this->language])
         ];
     }
