@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 
 class Comment extends Model
@@ -22,6 +23,16 @@ class Comment extends Model
      * @var array
      */
     protected $fillable = ['content'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($comment) {
+            // Delete likes associated with the comment
+            DB::table('comments_likes')->where('comment_id', $comment->id)->delete();
+        });
+    }
 
     public function user()
     {

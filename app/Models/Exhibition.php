@@ -22,12 +22,12 @@ class Exhibition extends Model
      */
     protected $fillable = ['title', 'description', 'public', 'start_time', 'end_time'];
 
-    public function gallery()
+    public function user()
     {
         return $this->belongsTo(User::class)->withDefault();
     }
     public function posts()
     {
-        return $this->belongsToMany(User::class, 'exhibitions_posts', 'exhibition_id', 'post_id');
+        return $this->belongsToMany(Post::class, 'exhibitions_posts', 'exhibition_id', 'post_id');
     }
 }

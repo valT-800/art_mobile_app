@@ -26,12 +26,16 @@ class Competition extends Model
     {
         return $this->belongsToMany(Post::class, 'competitions_posts', 'competition_id', 'post_id');
     }
-    public function gallery()
+    public function user()
     {
         return $this->belongsTo(User::class)->withDefault();
     }
-    public function winner()
+    public function winners()
     {
-        return $this->hasOneThrough(Post::class,'winnings','competition_id','post_id');
+        return $this->belongsToMany(Post::class,'winnings','competition_id','post_id');
+    }
+    public function users_voted()
+    {
+        return $this->belongsToMany(User::class,'posts_votes','competition_id','user_id');
     }
 }
