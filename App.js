@@ -3,7 +3,7 @@
 
 import { AuthProvider } from './src/AuthProvider';
 import Routes from './src/Routes';
-import { CustomColorSchemeProvider } from './src/screens/CustomColorScheme';
+import { CustomColorSchemeProvider } from './src/CustomColorScheme';
 
 
 export default function Provider (){

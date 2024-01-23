@@ -1,7 +1,7 @@
 // ColorSchemeButton.js
 
 import React, { useContext } from 'react';
-import { CustomColorSchemeContext } from '../screens/CustomColorScheme';
+import { CustomColorSchemeContext } from '../CustomColorScheme';
 import { TouchableOpacity, View } from 'react-native';
 import {NormalText} from './AppTextComponents';
 import TouchableListItem from './TouchableListItem';
