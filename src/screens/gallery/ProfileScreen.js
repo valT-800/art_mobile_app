@@ -9,14 +9,16 @@ import {NormalText} from "../../components/AppTextComponents";
 import {OtherText} from "../../components/AppTextComponents";
 import CustomIcon from "../../components/CustomIcon";
 import TouchableSection from "../../components/TouchableSection";
-import { useTheme } from "@react-navigation/native";
+import { useIsFocused, useTheme } from "@react-navigation/native";
 import TouchableListItem from "../../components/TouchableListItem";
 import TouchableText from "../../components/TouchableText";
 import Competition from "../../components/Competition";
 import Exhibition from "../../components/Exhibition";
+import Divider from "../../components/Divider";
 
-export default function GalleryProfileScreen({navigation: {navigate}}){
+export default function GalleryProfileScreen({navigation: {navigate,addListener}}){
 
+  const isFocused = useIsFocused();
   const { user} = useContext(AuthContext)
   const[loggedUser, setLoggedUser] = useState([])
   const[competitions, setCompetitions] = useState([])
@@ -29,13 +31,14 @@ export default function GalleryProfileScreen({navigation: {navigate}}){
   const {colors} = useTheme()
   const[visible, setVisible]= useState(false) //sets visibility of down Modal to uppear then '+' icon (new content) is pressed
 
-
   const onUserRefresh = () => {
     setLoadingUser(true)
+    setVisible(false)
     setCompetitions([])
     setExhibitions([])
     setCurrentPage(1)
     setLoading(true)
+    fetchData()
     setTimeout(() => {
       setLoadingUser(false)
       setLoading(false)
@@ -65,9 +68,27 @@ export default function GalleryProfileScreen({navigation: {navigate}}){
   }
     
   }
+  async function getPlannedCompetitions(){
+    if(loggedUser.planned_competitions != 0){
+    await api.get(`api/planned-competitions/user/${user.id}/?page=${currentPage}`)
+    .then(response => {
+      console.log("Filtered", response.data)
+      const{data, meta} =response.data;
+      setCompetitions((prevCompetition) => [...prevCompetition, ...data]);
+      setTotalPages(meta.last_page);
+      setLoading(false)
+    })
+    .catch(error => {
+      console.log(error.response);
+      setLoading(false)
+  })
+}else{
+  setCompetitions([])
+  setLoading(false)}
+  }
   async function getPublishedCompetitions(){
     if(loggedUser.published_competitions != 0){
-    await api.get(`api/published-competitions/${user.id}/?page=${currentPage}`)
+    await api.get(`api/published-competitions/user/${user.id}/?page=${currentPage}`)
     .then(response => {
       console.log("Filtered", response.data)
       const{data, meta} =response.data;
@@ -86,7 +107,7 @@ export default function GalleryProfileScreen({navigation: {navigate}}){
   
   async function getPublishedExpiredCompetitions(){
     if(loggedUser.published_expired_competitions != 0){
-    await api.get(`api/published-competitions-archive/${user.id}/?page=${currentPage}`)
+    await api.get(`api/published-competitions-archive/user/${user.id}/?page=${currentPage}`)
       .then(response => {
         //console.log("Filtered", response.data)
         const{data, meta} =response.data;
@@ -121,10 +142,27 @@ export default function GalleryProfileScreen({navigation: {navigate}}){
    }else{setExhibitions([])
     setLoading(false)}
   }
-    
+  async function getPlannedExhibitions(){
+    if(loggedUser.planned_exhibitions != 0){
+    await api.get(`api/planned-exhibitions/user/${user.id}/?page=${currentPage}`)
+    .then(response => {
+      console.log("Filtered", response.data)
+      const{data, meta} =response.data;
+      setExhibitions((prev) => [...prev, ...data]);
+      setTotalPages(meta.last_page);
+      setLoading(false)
+    })
+    .catch(error => {
+      console.log(error.response);
+      setLoading(false)
+  })
+}else{
+  setCompetitions([])
+  setLoading(false)}
+  } 
   async function getPublishedExhibitions(){
     if(loggedUser.published_exhibitions != 0){
-    await api.get(`api/published-exhibitions/${user.id}/?page=${currentPage}`)
+    await api.get(`api/published-exhibitions/user/${user.id}/?page=${currentPage}`)
     .then(response => {
       console.log("Filtered", response.data)
       const{data, meta} =response.data;
@@ -165,21 +203,23 @@ export default function GalleryProfileScreen({navigation: {navigate}}){
 
   function fetchData(){
     if(pressedSection==="Competitions") getPublishedCompetitions()
+    else if(pressedSection==="Planned competitions") getPlannedCompetitions()
     else if(pressedSection==="Competition drafts") getUnpublishedCompetitions()
+    else if(pressedSection==="Passed competitions") getPublishedExpiredCompetitions()
+    else if(pressedSection==="Planned exhibitions") getPlannedExhibitions()
     else if(pressedSection==="Exhibitions") getPublishedExhibitions()
     else if(pressedSection==="Exhibition drafts") getUnpublishedExhibitions()
   }
   useEffect(() => {
     fetchData()
   }, [currentPage]);
-
-  if(loadingUser){
-    return (<ActivityIndicator size='large'></ActivityIndicator>)
-  }
-  else{
     return(
         <SafeAreaView style = {styles.container}>
-          <ScrollView
+          {loadingUser ? 
+          (
+            <ActivityIndicator size={'large'}/>
+          ) :
+          (<ScrollView
           onEndReached={handleLoadMore}
           scrollEventThrottle={16}
           refreshControl={
@@ -188,7 +228,7 @@ export default function GalleryProfileScreen({navigation: {navigate}}){
           <View style={{alignItems: 'center'}}>
             <Image
             source={loggedUser.profile_photo_url}
-            style={{width: 100, height: 100, borderRadius: 50}}>
+            style={{width: 100, height: 100, borderRadius: 50,justifyContent:'center',alignItems:'center'}}>
             </Image>
             <NormalText text={loggedUser.name}/>
             <OtherText text={loggedUser.email}/>
@@ -202,9 +242,13 @@ export default function GalleryProfileScreen({navigation: {navigate}}){
           <View style={{flexDirection: 'row', alignSelf: 'center'}}>
             <CustomIcon name = 'add' size={30} event={()=> {setVisible(true)}}/>
           </View>
-
-          <ScrollView horizontal={true} style = {{margin: 5}}>
-            <TouchableSection title = "Competition drafts"
+          
+          <Divider/>
+          <View style = {{margin: 2,alignItems: 'center'}}>
+            <NormalText text='Competitions'/>
+            <View style = {{flexDirection:'row'}}>  
+            <TouchableSection title = "drafts"
+            pressedSection = "Competition drafts"
             onPress={() => {
               setCompetitions([])
               setCurrentPage(1)
@@ -212,25 +256,59 @@ export default function GalleryProfileScreen({navigation: {navigate}}){
               getUnpublishedCompetitions()
             }} 
             pressed = {pressedSection}/>
-            <TouchableSection title = "Competitions"
-            onPress={() => { 
+            <TouchableSection title = "coming"
+            pressedSection = "Planned competitions"
+            onPress={async() => {
+              setCompetitions([])
+              setCurrentPage(1)
+              setPressedSection("Planned competitions")
+              getPlannedCompetitions()
+            }}
+            pressed ={pressedSection}/>
+            <TouchableSection title = "now"
+            pressedSection = "Competitions"
+            onPress={async() => { 
               setCompetitions([])  
               setCurrentPage(1)
               setPressedSection("Competitions")
               getPublishedCompetitions()
             }}
              pressed = {pressedSection}/>
-             
-            <TouchableSection title = "Exhibition drafts"
+             <TouchableSection title = "passed"
+             pressedSection = "Passed competitions"
+             onPress={async() => { 
+               setCompetitions([])  
+               setCurrentPage(1)
+               setPressedSection("Passed competitions")
+               getPublishedExpiredCompetitions()
+             }}
+              pressed = {pressedSection}/>
+             </View>
+            </View>
+            <Divider/>
+            <View style = {{margin: 2, alignItems: 'center'}}>   
+            <NormalText text='Exhibitions'/>  
+            <View style = {{flexDirection:'row'}}>   
+            <TouchableSection title = "drafts"
+            pressedSection = "Exhibition drafts"
             onPress={async() => {
               setExhibitions([])
               setCurrentPage(1)
               setPressedSection("Exhibition drafts")
               getUnpublishedExhibitions()
+            }}
+            pressed = {pressedSection}/>
+            <TouchableSection title = "coming"
+            pressedSection = "Planned exhibitions"
+            onPress={async() => {
+              setExhibitions([])
+              setCurrentPage(1)
+              setPressedSection("Planned exhibitions")
+              getPlannedExhibitions()
             }} 
             pressed = {pressedSection}/>
-
-            <TouchableSection title = "Exhibitions"
+            <TouchableSection title = "now"
+            pressedSection = "Exhibitions"
             onPress={async() => {
               setExhibitions([])
               setCurrentPage(1)
@@ -238,25 +316,27 @@ export default function GalleryProfileScreen({navigation: {navigate}}){
               getPublishedExhibitions()
             }}
              pressed = {pressedSection}/>
-          </ScrollView>
+             </View>
+            </View> 
+            <Divider/>
           {loading ? <ActivityIndicator/> :  <View style={styles.items}>
-          {(pressedSection ==="Competitions" || pressedSection ==="Competition drafts") &&
+          {(pressedSection ==="Competitions" || pressedSection ==="Competition drafts" || pressedSection==="Planned competitions" || pressedSection==="Passed competitions") &&
             <FlatList
               data={competitions}
               renderItem={({item}) => {
               return(<Competition competition={item}/>)}}
-              numColumns={3}
+              numColumns={2}
               scrollEnabled={false}
               keyExtractor = {( item, index) => item.id }
               //onEndReached={handleLoadMore}
               //onEndReachedThreshold={0.1}
             ></FlatList>}
-          {(pressedSection ==="Exhibitions" || pressedSection ==="Exhibition drafts") && 
+          {(pressedSection ==="Exhibitions" || pressedSection ==="Exhibition drafts" || pressedSection==="Planned exhibitions") && 
             <FlatList
               data={exhibitions}
               renderItem={({item}) => {
               return(<Exhibition exhibition={item}/>)}}
-              numColumns={3}
+              numColumns={2}
               scrollEnabled={false}
               keyExtractor = {( item, index) => item.id }
               //onEndReached={handleLoadMore}
@@ -272,22 +352,18 @@ export default function GalleryProfileScreen({navigation: {navigate}}){
             <TouchableListItem title='New exhibition' onPress={()=>navigate('NewExhibition')}/> 
           </View>
         </Modal>
-          </ScrollView>
+          </ScrollView>)}
         </SafeAreaView>
       )
     }
-  }
 
 const styles = StyleSheet.create({
   container:{
     justifyContent: 'center',
     flex: 1
   },
-  albums: {
-    alignItems: 'flex-start',
-  },
   items: {
-    flex: 1, 
+    flex: 1,
   },
   overlayContainer: {
     borderTopLeftRadius: 10,

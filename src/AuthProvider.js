@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import {api} from './services/api_base';
-//api.defaults.baseURL = 'http://192.168.1.103:8000';
+
 export const AuthContext = React.createContext({});
 
 export const AuthProvider = ({children}) => {
@@ -16,13 +16,14 @@ export const AuthProvider = ({children}) => {
         user,
         setUser,
         error,
-        register: (name, username, email, password, confirmation_password) => {
+        register: (name, username, email, password, confirmation_password,isGallerySelected) => {
             api.post('api/register',  {
                 name,
                 username,
                 email,
                 password,
                 confirmation_password,
+                isGallerySelected
                 
             }).then(response => {
                 //console.log('Data:', response.data.data);
@@ -40,8 +41,8 @@ export const AuthProvider = ({children}) => {
                 SecureStore.setItemAsync('user', JSON.stringify(userResponse));
             })
             .catch(error => {
-              //console.log('Register error:', error.response.data);
-              setError(error.response.data);
+              console.log('Register error:', error.response.data);
+              setError(error.response.data.data);
             })
         },
         login: (email_or_username, password) => {
