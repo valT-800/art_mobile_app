@@ -1,38 +1,51 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Post } from 'expo-image';
+import React, { useContext, useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image } from 'expo-image';
 import { api, baseURL } from '../../services/api_base';
 import {NormalText} from '../../components/AppTextComponents';
-import AddPostToCompetition from '../../utils/addPostToCompetition';
+import addPostToCompetition from '../../utils/addPostToCompetition';
+import { AuthContext } from '../../AuthProvider';
 
 
-function PickPostFromApp({navigation:{navigate}, route}){
+export default function PickPostFromAppScreen({navigation:{navigate}, route}){
     const{id} = route.params;
+    const{user} = useContext(AuthContext)
     const[posts, setPosts] = useState([])
+    const[loading, setLoading]=useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
     const handleLoadMore = () => {
         if (currentPage < totalPages) {
           setCurrentPage((prevPage) => prevPage + 1);
+          setLoading(true)
         }
       };
 
-      
-      useEffect(() => {
-        
-        api.get('api/user/posts')
+      async function fetchPosts()
+      {
+        await api.get(`api/posts/user/${user.id}`)
           .then(response => {
             const{data, meta} = response.data;
             setPosts((prevPost) => [...prevPost, ...data]);
             setTotalPages(meta.total_pages);
+            setLoading(false)
           })
           .catch(error => {
-            //console.log("Error", error.response);   
+            //console.log("Error", error.response);
+            setLoading(false)
           })   
-          
+      }
+      
+      useEffect(() => {
+        fetchPosts()
       }, [currentPage]);
-
+      
+      if(loading){
+        return <ActivityIndicator/>
+      }
+      else
+      {
     return(
     <SafeAreaView style={styles.container}>
         <NormalText text='Pick'/>
@@ -48,10 +61,10 @@ function PickPostFromApp({navigation:{navigate}, route}){
                 }}>
                 <TouchableOpacity
                 onPress={async()=> {
-                  AddPostToCompetition(item.id, {id})
+                  addPostToCompetition(item.id, {id})
                   navigate('Competition', {id})}}>
-                    <Post style={styles.post}
-                        source={baseURL + item.url }></Post>
+                    <Image style={styles.post}
+                        source={baseURL + item.url }></Image>
                     </TouchableOpacity>
                 </View>
               )}}
@@ -64,7 +77,7 @@ function PickPostFromApp({navigation:{navigate}, route}){
     </SafeAreaView>
     )
   }
-  export default PickPostFromApp;
+}
 
   
 const styles = StyleSheet.create({
