@@ -1,6 +1,6 @@
 import { api } from "../services/api_base";
 
-export default async function AddPostToCompetition(post_id, competition_id){
+export default async function addPostToCompetition(post_id, competition_id){
     api.put(`api/user/posts/${post_id}`, {competition_id: competition_id.id}).then(response => {       
         
         //console.log('Competition', competition_id)
